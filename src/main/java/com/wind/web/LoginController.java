@@ -17,7 +17,7 @@ public class LoginController  implements Controller{
 			HttpServletResponse arg1) throws Exception {
 		String stateCode=oauth.generateStateCode();
 		HttpSession s=arg0.getSession();
-		s.setAttribute("stateCode", stateCode);
+		s.setAttribute(WebConstants.STATECODE, stateCode);
 		arg1.sendRedirect(oauth.getOAuthRequestURL(stateCode));
 		return null;
 	}

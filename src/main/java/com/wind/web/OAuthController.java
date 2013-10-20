@@ -17,14 +17,14 @@ public class OAuthController implements Controller{
 	@Override
 	public ModelAndView handleRequest(HttpServletRequest arg0,
 			HttpServletResponse arg1) throws Exception {
-		String stateCode=arg0.getParameter("state");
-		String code=arg0.getParameter("code");
+		String stateCode=arg0.getParameter(WebConstants.STATECODE);
+		String code=arg0.getParameter(WebConstants.CALLBACKCODE);
 		if(code==null || stateCode==null)
 		{
 			return new ModelAndView(errorPage,"errorCode","Please login again");
 		}
 		HttpSession s=arg0.getSession();
-		String previousStateCode=(String)(s.getAttribute("stateCode"));
+		String previousStateCode=(String)(s.getAttribute(WebConstants.STATECODE));
 		if(previousStateCode==null || !previousStateCode.equals(stateCode))
 		{
 			return new ModelAndView(errorPage,"errorCode","No sync state");
@@ -34,7 +34,7 @@ public class OAuthController implements Controller{
 		{
 			return new ModelAndView(errorPage,"errorCode","Get AccessToken Failed");
 		}
-		s.setAttribute("accessToken", accessToken);
+		s.setAttribute(WebConstants.ACCESSTOKEN, accessToken);
 		arg1.sendRedirect(successPage);
 		return null;
 	}
