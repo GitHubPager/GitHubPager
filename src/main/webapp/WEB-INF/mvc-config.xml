@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="urlHandlerMapping"
+          class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="/about">aboutController</prop>
+                <prop key="/oauth">oauthController</prop>
+                <prop key="/login">loginController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <mvc:annotation-driven />
+
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	        <!-- Example: a logical view name of 'showMessage' is mapped to '/WEB-INF/jsp/showMessage.jsp' -->
+	        <property name="prefix" value="/WEB-INF/view/"/>
+	        <property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<bean id="aboutController" class="org.springframework.web.servlet.mvc.ParameterizableViewController">
+	<property name="viewName"> 
+    	<value>about</value> 
+    </property> 
+	</bean>
+	
+	<bean id="oauthController" class="com.wind.web.OAuthController">
+	<property name="oauth"><ref bean="oauth"/></property>
+	<property name="successPage"><value>manage</value></property>
+	<property name="errorPage"><value>errorOAuth</value></property>
+	</bean>
+	
+	<bean id="loginController" class="com.wind.web.LoginController">
+	<property name="oauth"><ref bean="oauth"/></property>
+	</bean>
+	
+	<bean id="manageParaMethodResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver"> 
+        <property name="paramName">
+            <value>action</value>
+        </property> 
+        <property name="defaultMethodName">
+            <value>check</value>
+        </property> 
+    </bean> 
+	
+	<bean id="manageController" class="com.wind.web.ManageController">
+	<property name="methodNameResolver"><ref bean="manageParaMethodResolver"/></property>
+	</bean>
+	
+	
+</beans>

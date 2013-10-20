@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    
+    <!-- Uncomment and add your base-package here:
+         <context:component-scan
+            base-package="org.springframework.samples.service"/>  -->
+	<bean id="oauth" class="com.wind.github.OAuth">
+	<property name="authUrl"><value>https://github.com/login/oauth/authorize</value></property>
+	<property name="clientId"><value>5ecc1b6834b646d1510c</value></property>
+	<property name="clientSecret"><value>74091d7478b842b24236dc34d554689ebe339a42</value></property>
+	<property name="accessTokenUrl"><value>/login/oauth/access_token</value></property>
+	</bean>
+</beans>
