@@ -55,7 +55,7 @@
 	<bean id="oauthController" class="com.wind.web.OAuthController">
 	<property name="oauth"><ref bean="oauth"/></property>
 	<property name="successPage"><value>manage</value></property>
-	<property name="errorPage"><value>errorOAuth</value></property>
+	<property name="errorPage"><value>error</value></property>
 	</bean>
 	
 	<bean id="loginController" class="com.wind.web.LoginController">
@@ -75,8 +75,10 @@
 	<property name="methodNameResolver">
 	<ref bean="manageParaMethodResolver"/>
 	</property>
-	
-	
+	<property name="pageManager">
+	<ref bean="pageManager"/>
+	</property>
+	<property name="errorPage"><value>error</value></property>
 	</bean>
 	
 	<bean id="sessionInterceptor" class="com.wind.web.SessionInterceptor">

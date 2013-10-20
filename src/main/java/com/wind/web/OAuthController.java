@@ -21,18 +21,18 @@ public class OAuthController implements Controller{
 		String code=arg0.getParameter(WebConstants.CALLBACKCODE);
 		if(code==null || stateCode==null)
 		{
-			return new ModelAndView(errorPage,"errorCode","Please login again");
+			return new ModelAndView(errorPage,WebConstants.ERRORCODE,WebConstants.OAUTHNOTSYNCERRORCODE);
 		}
 		HttpSession s=arg0.getSession();
 		String previousStateCode=(String)(s.getAttribute(WebConstants.STATECODE));
 		if(previousStateCode==null || !previousStateCode.equals(stateCode))
 		{
-			return new ModelAndView(errorPage,"errorCode","No sync state");
+			return new ModelAndView(errorPage,WebConstants.ERRORCODE,WebConstants.OAUTHNOTSYNCERRORCODE);
 		}
 		String accessToken=oauth.getAccessToken(code);
 		if(accessToken==null||accessToken.isEmpty())
 		{
-			return new ModelAndView(errorPage,"errorCode","Get AccessToken Failed");
+			return new ModelAndView(errorPage,WebConstants.ERRORCODE,WebConstants.ACCESSTOKENREMOTEFAILED);
 		}
 		s.setAttribute(WebConstants.ACCESSTOKEN, accessToken);
 		arg1.sendRedirect(successPage);

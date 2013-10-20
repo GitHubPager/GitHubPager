@@ -20,6 +20,10 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     
+    <error-page>
+    <exception-type>java.lang.Exception</exception-type>
+    <location>/WEB-INF/view/exception.jsp</location>
+    </error-page>
     
     <!--
 		- Servlet that dispatches request to registered handlers (Controller implementations).
