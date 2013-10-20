@@ -77,7 +77,14 @@ public class PageManager {
 			return false;
 		}
 	}
-	
+	public Repository getRepositoryById(int repoId)
+	{
+		return null;
+	}
+	public boolean isPageRepository(String userName,Repository repo)
+	{
+		return repo.getName().equals(userName+PAGEPOSTFIX);
+	}
 	public boolean isRepositoryPageInit(Repository repo,String accessToken)
 	{
 		ContentsServiceEx cService=new ContentsServiceEx();
