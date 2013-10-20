@@ -4,7 +4,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 
-public final class error_jsp extends org.apache.jasper.runtime.HttpJspBase
+public final class exception_jsp extends org.apache.jasper.runtime.HttpJspBase
     implements org.apache.jasper.runtime.JspSourceDependent {
 
   private static final JspFactory _jspxFactory = JspFactory.getDefaultFactory();
@@ -41,16 +41,13 @@ public final class error_jsp extends org.apache.jasper.runtime.HttpJspBase
       _jspx_out = out;
       _jspx_resourceInjector = (org.glassfish.jsp.api.ResourceInjector) application.getAttribute("com.sun.appserv.jsp.resource.injector");
 
-      out.write("\n");
       out.write("<html>\n");
       out.write("\t<head>\n");
       out.write("\t\t<meta charset=\"utf-8\">\n");
       out.write("\t\t<title>Error</title>\n");
       out.write("\t</head> \n");
       out.write("\t<body>\n");
-      out.write("\t\t<h2>Error. Code:");
-      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${errorCode}", java.lang.String.class, (PageContext)_jspx_page_context, null));
-      out.write("</h2>\n");
+      out.write("\t\t<h2>Error. OOP! Exception!</h2>\n");
       out.write("\t</body>\n");
       out.write("</html>");
     } catch (Throwable t) {

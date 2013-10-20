@@ -46,19 +46,38 @@ public class PageManager {
 			return null;
 		}
 	}
-	public boolean isAccountReadyForPage(String userName,String companyName,List<Repository> repos)
+	public boolean isAccountReadyForPage(String userName,List<Repository> repos)
 	{
-		if(companyName==null || companyName.isEmpty()) 
-			companyName="!@#$%^"; //Avoid Mismatch
+		userName=userName.toLowerCase();
+		
 		for(Repository repo:repos)
 		{
-			if(repo.getName().equals(userName+PAGEPOSTFIX)||repo.getName().equals(companyName+PAGEPOSTFIX))
+			
+			if(repo.getName().equals(userName+PAGEPOSTFIX))
 			{
 				return true;
 			}
 		}
 		return false;
 	}
+	public boolean initAccount(String domainName,String accessToken)
+	{
+		RepositoryService rService=new RepositoryService();
+		rService.getClient().setOAuth2Token(accessToken);
+		try
+		{
+			Repository r=new Repository();
+			r.setName(domainName+PAGEPOSTFIX);
+			rService.createRepository(r);
+			return true;
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to create repo ",e);
+			return false;
+		}
+	}
+	
 	public boolean isRepositoryPageInit(Repository repo,String accessToken)
 	{
 		ContentsServiceEx cService=new ContentsServiceEx();

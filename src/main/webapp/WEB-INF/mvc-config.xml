@@ -54,7 +54,7 @@
 	
 	<bean id="oauthController" class="com.wind.web.OAuthController">
 	<property name="oauth"><ref bean="oauth"/></property>
-	<property name="successPage"><value>manage</value></property>
+	<property name="successPage"><value>manage?action=list</value></property>
 	<property name="errorPage"><value>error</value></property>
 	</bean>
 	
@@ -67,7 +67,7 @@
             <value>action</value>
         </property> 
         <property name="defaultMethodName">
-            <value>init</value>
+            <value>list</value>
         </property> 
     </bean> 
 	
@@ -79,6 +79,8 @@
 	<ref bean="pageManager"/>
 	</property>
 	<property name="errorPage"><value>error</value></property>
+	<property name="initAccountPage"><value>manage?action=initAccount</value></property>
+	<property name="listViewPage"><value>list</value></property>
 	</bean>
 	
 	<bean id="sessionInterceptor" class="com.wind.web.SessionInterceptor">

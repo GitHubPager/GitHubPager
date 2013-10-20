@@ -14,6 +14,27 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
     {
 		
 		HttpSession s=request.getSession(false);
+		if(checkAccessToken(s))
+		{
+			return true;
+		}
+		response.sendRedirect(errorRedirectPage);
+		return false;
+	}
+	/*private boolean checkInit(HttpServletRequest request,HttpSession s)
+	{
+		String action=request.getParameter("action");
+		if(action!=null&&!action.equals("init"))
+		{
+			if(s.getAttribute(WebConstants.INITFLAG)==null)
+			{
+				return false;
+			}
+		}
+		return true;
+	}*/
+	private boolean checkAccessToken(HttpSession s)
+	{
 		if(s!=null)
 		{
 			String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
@@ -22,10 +43,8 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 				return true;
 			}
 		}
-		response.sendRedirect(errorRedirectPage);
 		return false;
 	}
-	
 	private String errorRedirectPage;
 
 	public void setErrorRedirectPage(String errorRedirectPage) {
