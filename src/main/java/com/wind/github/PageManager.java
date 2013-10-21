@@ -1,8 +1,9 @@
 package com.wind.github;
 
-import java.util.List;
+import java.io.IOException;import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryContents;
 
 import org.eclipse.egit.github.core.User;
 
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class PageManager {
 	private static String PAGEPOSTFIX=".github.io";
 	private static String PAGEENTRYFILE=".githubpager";
-	private static String MAINPAGEBRANCH="master";
+	private static String ACCOUNTPAGEBRANCH="master";
 	private static String PROJECTPAGEBRANCH="gh-pages";
 	private static Logger logger=LoggerFactory.getLogger(PageManager.class);
 	public User getBasicUserInfo(String accessToken) throws Exception
@@ -30,9 +31,9 @@ public class PageManager {
 		return rService.getRepositories();
 		
 	}
-	public boolean isAccountReadyForPage(String userName,List<Repository> repos)
+	public boolean isAccountReadyForPage(User u,List<Repository> repos)
 	{
-		userName=userName.toLowerCase();
+		String userName=u.getLogin().toLowerCase();
 		
 		for(Repository repo:repos)
 		{
@@ -44,29 +45,60 @@ public class PageManager {
 		}
 		return false;
 	} 
-	public void initAccount(String domainName,String accessToken) throws Exception
+	public void initAccount(User u,String accessToken) throws Exception
 	{
 		RepositoryService rService=new RepositoryService();
 		rService.getClient().setOAuth2Token(accessToken);
 		Repository r=new Repository();
-		r.setName(domainName+PAGEPOSTFIX);
+		r.setName(u.getLogin()+PAGEPOSTFIX);
 		rService.createRepository(r);
 		
 	}
-	public Repository getRepositoryById(int repoId)
+	public Repository getRepositoryById(String repoName,User u,String accessToken) throws Exception
 	{
-		return null;
+		RepositoryService rService=new RepositoryService();
+		rService.getClient().setOAuth2Token(accessToken);
+		Repository repo=new Repository();
+		repo.setName(repoName);
+		repo.setOwner(u);
+		repo=rService.getRepository(repo);
+		return repo;
 	}
-	public boolean isPageRepository(String userName,Repository repo)
+	public boolean isAccountRepository(User u,Repository repo)
 	{
-		return repo.getName().equals(userName+PAGEPOSTFIX);
+		return repo.getName().equals(u.getLogin().toLowerCase()+PAGEPOSTFIX);
 	}
-	public boolean isRepositoryPageInit(Repository repo,String accessToken)
+	public boolean isRepositoryPageInit(String repoName,User u,String accessToken) throws Exception
 	{
-	
-			
+		RepositoryService rService=new RepositoryService();
+		ContentsServiceEx cService=new ContentsServiceEx();
+		rService.getClient().setOAuth2Token(accessToken);
+		cService.getClient().setOAuth2Token(accessToken);
+		Repository repo=new Repository();
+		repo.setName(repoName);
+		repo.setOwner(u);
+		repo=rService.getRepository(repo);
+		String branch;
+		if(isAccountRepository(u,repo))
+		{
+			branch=ACCOUNTPAGEBRANCH;
+		}
+		else
+		{
+			branch=PROJECTPAGEBRANCH;
+		}
+		try
+		{
+			cService.getContents(repo,PAGEENTRYFILE ,branch);
+			return true;
+		}
+		catch(IOException e)
+		{
+			logger.info("Uninit repo of {}",u.getLogin());
+			return false;
+		}
 		
-		return false;
+		
 	}
 	
 }

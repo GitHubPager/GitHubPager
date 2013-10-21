@@ -18,13 +18,15 @@ public class ManageController extends MultiActionController{
 	
 	String listViewPage;
 	String initAccountPage;
+	String beforeSetupPage;
+	String beforeSetupViewPage;
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
-		User u=pageManager.getBasicUserInfo(accessToken);
+		User u=getUserInfoViaSession(s,accessToken);
 		List<Repository> repoArray=pageManager.getUserRepositories(accessToken);
-		if(repoArray.size()==0||!pageManager.isAccountReadyForPage(u.getLogin(), repoArray))
+		if(repoArray.size()==0||!pageManager.isAccountReadyForPage(u, repoArray))
 		{
 			res.sendRedirect(initAccountPage);
 			return null;
@@ -41,14 +43,58 @@ public class ManageController extends MultiActionController{
 		
 		HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
-		User u=pageManager.getBasicUserInfo(accessToken);	
-		String domainName=u.getLogin();
-		pageManager.initAccount(domainName, accessToken);
+		User u=getUserInfoViaSession(s,accessToken);	
+		
+		pageManager.initAccount(u, accessToken);
 		res.sendRedirect(req.getRequestURI());
 		return null;
 		
 	}
 	
+	public ModelAndView edit(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+    {
+		HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repoName");
+		if(pageManager.isRepositoryPageInit(repoName, u, accessToken))
+		{
+			
+		}
+		else
+		{
+			res.sendRedirect(beforeSetupPage+"&repoName="+repoName);
+		}
+		return null;
+    }
+	public ModelAndView logout(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+    {
+		HttpSession s=req.getSession();
+		s.invalidate();
+		res.sendRedirect(req.getRequestURI());
+		return null;
+    }
+	public ModelAndView beforeSetup(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+    {
+		HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repoName");
+		Repository repo=pageManager.getRepositoryById(repoName, u,accessToken);
+		ModelAndView view=new ModelAndView();
+		view.addObject("repository", repo);
+		view.addObject("userInfo",u);
+		view.setViewName(beforeSetupViewPage);
+		return view;
+    }
+	public ModelAndView setup(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+    {
+		return null;
+    }
 	public void setPageManager(PageManager pageManager) {
 		this.pageManager = pageManager;
 	}
@@ -61,6 +107,27 @@ public class ManageController extends MultiActionController{
 	public void setinitAccountPage(String initAccountPage) {
 		this.initAccountPage = initAccountPage;
 	}
-	
+	public void setListViewPage(String listViewPage) {
+		this.listViewPage = listViewPage;
+	}
+	public void setInitAccountPage(String initAccountPage) {
+		this.initAccountPage = initAccountPage;
+	}
+	public void setbeforeSetupPage(String beforeSetupPage) {
+		this.beforeSetupPage = beforeSetupPage;
+	}
+	public void setbeforeSetupViewPage(String beforeSetupViewPage) {
+		this.beforeSetupViewPage = beforeSetupViewPage;
+	}
+	private User getUserInfoViaSession(HttpSession s,String accessToken) throws Exception
+	{
+		User u=(User)(s.getAttribute(WebConstants.USERINFOCODE));
+		if(u==null)
+		{
+			u=pageManager.getBasicUserInfo(accessToken);
+			s.setAttribute(WebConstants.USERINFOCODE, u);
+		}
+		return u;
+	}
 
 }

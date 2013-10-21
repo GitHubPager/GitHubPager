@@ -4,7 +4,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.jsp.*;
 
-public final class error_jsp extends org.apache.jasper.runtime.HttpJspBase
+public final class beforeSetup_jsp extends org.apache.jasper.runtime.HttpJspBase
     implements org.apache.jasper.runtime.JspSourceDependent {
 
   private static final JspFactory _jspxFactory = JspFactory.getDefaultFactory();
@@ -30,7 +30,7 @@ public final class error_jsp extends org.apache.jasper.runtime.HttpJspBase
     PageContext _jspx_page_context = null;
 
     try {
-      response.setContentType("text/html");
+      response.setContentType("text/html; charset=UTF-8");
       pageContext = _jspxFactory.getPageContext(this, request, response,
       			null, true, 8192, true);
       _jspx_page_context = pageContext;
@@ -41,13 +41,32 @@ public final class error_jsp extends org.apache.jasper.runtime.HttpJspBase
       _jspx_out = out;
       _jspx_resourceInjector = (org.glassfish.jsp.api.ResourceInjector) application.getAttribute("com.sun.appserv.jsp.resource.injector");
 
+      out.write("<!DOCTYPE html>\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("    \n");
       out.write("<html>\n");
       out.write("\t<head>\n");
       out.write("\t\t<meta charset=\"utf-8\">\n");
-      out.write("\t\t<title>Error</title>\n");
+      out.write("\t\t<title>Welcome</title>\n");
       out.write("\t</head> \n");
       out.write("\t<body>\n");
-      out.write("\t\t<h2>Error. OOP! Exception!</h2>\n");
+      out.write("\t<h1>User: ");
+      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${userInfo.getLogin()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
+      out.write("</h1>\n");
+      out.write("\t<h1>You are going to setup ");
+      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository.getName()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
+      out.write("</h1>\n");
+      out.write("\t<form action=\"manage\" method=\"post\">\n");
+      out.write("\t<input type=\"hidden\" name=\"action\" value=\"setup\"/>\n");
+      out.write("\t<input type=\"hidden\" name=\"rid\" value=\"");
+      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository.getId()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
+      out.write("\"/>\n");
+      out.write("\t<label>Title:</label><input type=\"text\" name=\"title\"/><br>\n");
+      out.write("\t<label>Description:</label><input type=\"text\" name=\"description\"/><br>\n");
+      out.write("\t<label>Domain:</label><input type=\"text\" name=\"domain\"/><br>\n");
+      out.write("\t</form>\n");
+      out.write("\t\n");
       out.write("\t</body>\n");
       out.write("</html>");
     } catch (Throwable t) {
