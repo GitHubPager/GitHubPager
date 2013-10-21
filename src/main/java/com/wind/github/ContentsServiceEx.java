@@ -16,6 +16,10 @@ import org.eclipse.egit.github.core.service.ContentsService;
 
 public class ContentsServiceEx extends ContentsService{
 	
+	public ContentsServiceEx()
+	{
+		super();
+	}
 	@Override
 	protected GitHubRequest createRequest()
 	{
@@ -23,7 +27,7 @@ public class ContentsServiceEx extends ContentsService{
 		request.setResponseContentType("application/vnd.github.beta.raw");
 		return request;
 	}
-	public void createFile(Repository repo, String path, String ref, String commitMessage, File f) throws IOException
+	/*public void createFile(Repository repo, String path, String ref, String commitMessage, File f) throws IOException
 	{
 		
 		ByteArrayOutputStream byteStream=null;
@@ -60,7 +64,8 @@ public class ContentsServiceEx extends ContentsService{
 		params.put("message", commitMessage);
 		params.put("branch", ref);
 		params.put("content", Base64Coder.encode(data));
-		String uri=String.format("repos/%s/%s/content/%s", repo.getOwner().getLogin(),repo.getName(),path);
+		String uri=String.format("/repos/%s/%s/contents/%s", repo.getOwner().getLogin(),repo.getName(),path);
 		client.put(uri, params, Map.class);
-	}
+		
+	}*/
 }

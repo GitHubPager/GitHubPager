@@ -2,11 +2,17 @@ package com.wind.github;
 
 import java.io.IOException;import java.util.List;
 
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.Reference;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryContents;
+import org.eclipse.egit.github.core.TypedResource;
 
 import org.eclipse.egit.github.core.User;
 
+import org.eclipse.egit.github.core.service.CommitService;
+import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.slf4j.Logger;
@@ -94,10 +100,42 @@ public class PageManager {
 		}
 		catch(IOException e)
 		{
+			if(e.getMessage().contains("404"))
+			{
 			logger.info("Uninit repo of {}",u.getLogin());
+			return false;
+			}
+			else throw e;
+		}
+	}
+	/*public boolean isRepositoryPageInit(String repoName,User u,String accessToken) throws Exception
+	{
+		RepositoryService rService=new RepositoryService();
+		CommitService cService=new CommitService();
+		rService.getClient().setOAuth2Token(accessToken);
+		cService.getClient().setOAuth2Token(accessToken);
+		Repository repo=new Repository();
+		repo.setName(repoName);
+		repo.setOwner(u);
+		repo=rService.getRepository(repo);
+		List<RepositoryCommit> clist=cService.getCommits(repo, "", "");
+		for(RepositoryCommit c:clist)
+		{
+			System.out.println(c.getCommit().getCommitter().getDate());
+		}
+		if(clist.size()>0)
+		{
+			return true;
+		}
+		else
+		{
 			return false;
 		}
 		
+	}*/
+	
+	public void initRepository(Repository repo, String branch ,String accessToken) throws Exception
+	{
 		
 	}
 	

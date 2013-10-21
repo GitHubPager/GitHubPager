@@ -18,8 +18,8 @@ public class ManageController extends MultiActionController{
 	
 	String listViewPage;
 	String initAccountPage;
-	String beforeSetupPage;
-	String beforeSetupViewPage;
+	String setupPage;
+	String setupViewPage;
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
@@ -64,7 +64,7 @@ public class ManageController extends MultiActionController{
 		}
 		else
 		{
-			res.sendRedirect(beforeSetupPage+"&repoName="+repoName);
+			res.sendRedirect(setupPage+"&repoName="+repoName);
 		}
 		return null;
     }
@@ -76,7 +76,7 @@ public class ManageController extends MultiActionController{
 		res.sendRedirect(req.getRequestURI());
 		return null;
     }
-	public ModelAndView beforeSetup(HttpServletRequest req, 
+	public ModelAndView setup(HttpServletRequest req, 
             HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
@@ -87,14 +87,10 @@ public class ManageController extends MultiActionController{
 		ModelAndView view=new ModelAndView();
 		view.addObject("repository", repo);
 		view.addObject("userInfo",u);
-		view.setViewName(beforeSetupViewPage);
+		view.setViewName(setupViewPage);
 		return view;
     }
-	public ModelAndView setup(HttpServletRequest req, 
-            HttpServletResponse res) throws Exception
-    {
-		return null;
-    }
+	
 	public void setPageManager(PageManager pageManager) {
 		this.pageManager = pageManager;
 	}
@@ -113,11 +109,11 @@ public class ManageController extends MultiActionController{
 	public void setInitAccountPage(String initAccountPage) {
 		this.initAccountPage = initAccountPage;
 	}
-	public void setbeforeSetupPage(String beforeSetupPage) {
-		this.beforeSetupPage = beforeSetupPage;
+	public void setSetupPage(String setupPage) {
+		this.setupPage = setupPage;
 	}
-	public void setbeforeSetupViewPage(String beforeSetupViewPage) {
-		this.beforeSetupViewPage = beforeSetupViewPage;
+	public void setSetupViewPage(String setupViewPage) {
+		this.setupViewPage = setupViewPage;
 	}
 	private User getUserInfoViaSession(HttpSession s,String accessToken) throws Exception
 	{

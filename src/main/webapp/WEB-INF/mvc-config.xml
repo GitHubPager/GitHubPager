@@ -79,8 +79,8 @@
 	</property>
 	<property name="initAccountPage"><value>manage?action=initAccount</value></property>
 	<property name="listViewPage"><value>list</value></property>
-	<property name="beforeSetupPage"><value>manage?action=beforeSetup</value></property>
-	<property name="beforeSetupViewPage"><value>beforeSetup</value></property>
+	<property name="setupPage"><value>manage?action=setup</value></property>
+	<property name="setupViewPage"><value>setup</value></property>
 	</bean>
 	
 	<bean id="sessionInterceptor" class="com.wind.web.SessionInterceptor">

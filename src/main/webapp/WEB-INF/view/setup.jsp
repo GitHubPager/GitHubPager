@@ -10,7 +10,7 @@
 	<body>
 	<h1>User: ${userInfo.getLogin()}</h1>
 	<h1>You are going to setup ${repository.getName()}</h1>
-	<form action="manage" method="post">
+	<form action="setup" method="post">
 	<input type="hidden" name="action" value="setup"/>
 	<input type="hidden" name="rid" value="${repository.getId()}"/>
 	<label>Title:</label><input type="text" name="title"/><br>
