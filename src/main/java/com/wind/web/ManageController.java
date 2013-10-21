@@ -15,7 +15,7 @@ import com.wind.github.PageManager;
 
 public class ManageController extends MultiActionController{
 	PageManager pageManager;
-	String errorPage;
+	
 	String listViewPage;
 	String initAccountPage;
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse res) throws Exception
@@ -23,15 +23,7 @@ public class ManageController extends MultiActionController{
 		HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=pageManager.getBasicUserInfo(accessToken);
-		if(u==null)
-		{
-			return new ModelAndView(errorPage,WebConstants.ERRORCODE,WebConstants.GETUSERINFOFAILED);
-		}
 		List<Repository> repoArray=pageManager.getUserRepositories(accessToken);
-		if(repoArray==null)
-		{
-			return new ModelAndView(errorPage,WebConstants.ERRORCODE,WebConstants.GETUSERREPOFAILED);
-		}
 		if(repoArray.size()==0||!pageManager.isAccountReadyForPage(u.getLogin(), repoArray))
 		{
 			res.sendRedirect(initAccountPage);
@@ -51,15 +43,9 @@ public class ManageController extends MultiActionController{
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=pageManager.getBasicUserInfo(accessToken);	
 		String domainName=u.getLogin();
-		if(pageManager.initAccount(domainName, accessToken))
-		{
-			res.sendRedirect(req.getRequestURI());
-			return null;
-		}
-		else
-		{
-			return new ModelAndView(errorPage,WebConstants.ERRORCODE,WebConstants.INITACCOUNTFAILED);
-		}
+		pageManager.initAccount(domainName, accessToken);
+		res.sendRedirect(req.getRequestURI());
+		return null;
 		
 	}
 	
@@ -67,9 +53,6 @@ public class ManageController extends MultiActionController{
 		this.pageManager = pageManager;
 	}
 
-	public void setErrorPage(String errorPage) {
-		this.errorPage = errorPage;
-	}
 
 
 	public void setlistViewPage(String listViewPage) {

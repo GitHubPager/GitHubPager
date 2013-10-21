@@ -3,7 +3,7 @@ package com.wind.github;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryContents;
+
 import org.eclipse.egit.github.core.User;
 
 import org.eclipse.egit.github.core.service.RepositoryService;
@@ -17,34 +17,18 @@ public class PageManager {
 	private static String MAINPAGEBRANCH="master";
 	private static String PROJECTPAGEBRANCH="gh-pages";
 	private static Logger logger=LoggerFactory.getLogger(PageManager.class);
-	public User getBasicUserInfo(String accessToken)
+	public User getBasicUserInfo(String accessToken) throws Exception
 	{
 		UserService uService=new UserService();
 		uService.getClient().setOAuth2Token(accessToken);
-		try
-		{
-			return uService.getUser();
-		}
-		catch(Exception e)
-		{
-			logger.error("Failed to get user info",e);
-			return null;
-		}
+		return uService.getUser();
 	}
-	public List<Repository> getUserRepositories(String accessToken)
+	public List<Repository> getUserRepositories(String accessToken) throws Exception
 	{
 		RepositoryService rService=new RepositoryService();
 		rService.getClient().setOAuth2Token(accessToken);
-		try
-		{
-			
-			 return rService.getRepositories();
-		}
-		catch(Exception e)
-		{
-			logger.error("Failed to get repo info",e);
-			return null;
-		}
+		return rService.getRepositories();
+		
 	}
 	public boolean isAccountReadyForPage(String userName,List<Repository> repos)
 	{
@@ -59,23 +43,15 @@ public class PageManager {
 			}
 		}
 		return false;
-	}
-	public boolean initAccount(String domainName,String accessToken)
+	} 
+	public void initAccount(String domainName,String accessToken) throws Exception
 	{
 		RepositoryService rService=new RepositoryService();
 		rService.getClient().setOAuth2Token(accessToken);
-		try
-		{
-			Repository r=new Repository();
-			r.setName(domainName+PAGEPOSTFIX);
-			rService.createRepository(r);
-			return true;
-		}
-		catch(Exception e)
-		{
-			logger.error("Failed to create repo ",e);
-			return false;
-		}
+		Repository r=new Repository();
+		r.setName(domainName+PAGEPOSTFIX);
+		rService.createRepository(r);
+		
 	}
 	public Repository getRepositoryById(int repoId)
 	{
@@ -87,17 +63,9 @@ public class PageManager {
 	}
 	public boolean isRepositoryPageInit(Repository repo,String accessToken)
 	{
-		ContentsServiceEx cService=new ContentsServiceEx();
-		cService.getClient().setOAuth2Token(accessToken);
-		try
-		{
-			List<RepositoryContents> contentArray=cService.getContents(repo, PAGEENTRYFILE,PROJECTPAGEBRANCH);
+	
 			
-		}
-		catch(Exception e)
-		{
-			
-		}
+		
 		return false;
 	}
 	
