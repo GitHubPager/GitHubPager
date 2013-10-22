@@ -17,8 +17,8 @@ public class ManageController extends MultiActionController{
 	PageManager pageManager;
 	
 	String listViewPage;
-	String initAccountPage;
-	String setupPage;
+	String initMainURL;
+	String setupURL;
 	String setupViewPage;
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse res) throws Exception
     {
@@ -28,7 +28,7 @@ public class ManageController extends MultiActionController{
 		List<Repository> repoArray=pageManager.getUserRepositories(accessToken);
 		if(repoArray.size()==0||!pageManager.isAccountReadyForPage(u, repoArray))
 		{
-			res.sendRedirect(initAccountPage);
+			res.sendRedirect(initMainURL);
 			return null;
 		}
 		ModelAndView view=new ModelAndView();
@@ -37,7 +37,7 @@ public class ManageController extends MultiActionController{
 		view.addObject("userInfo", u);
 		return view;
     }
-	public ModelAndView initAccount(HttpServletRequest req, 
+	public ModelAndView initAccountPage(HttpServletRequest req, 
             HttpServletResponse res) throws Exception
 	{
 		
@@ -45,7 +45,7 @@ public class ManageController extends MultiActionController{
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);	
 		
-		pageManager.initAccount(u, accessToken);
+		pageManager.initAccountPage(u, accessToken);
 		res.sendRedirect(req.getRequestURI());
 		return null;
 		
@@ -58,14 +58,14 @@ public class ManageController extends MultiActionController{
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
 		String repoName=req.getParameter("repoName");
-		if(pageManager.isRepositoryPageInit(repoName, u, accessToken))
+		/*if(pageManager.isRepositoryPageInit(repoName, u, accessToken))
 		{
 			
 		}
 		else
 		{
-			res.sendRedirect(setupPage+"&repoName="+repoName);
-		}
+			res.sendRedirect(setupURL+"&repoName="+repoName);
+		}*/
 		return null;
     }
 	public ModelAndView logout(HttpServletRequest req, 
@@ -83,7 +83,7 @@ public class ManageController extends MultiActionController{
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
 		String repoName=req.getParameter("repoName");
-		Repository repo=pageManager.getRepositoryById(repoName, u,accessToken);
+		Repository repo=pageManager.getRepositoryByName(repoName, u,accessToken);
 		ModelAndView view=new ModelAndView();
 		view.addObject("repository", repo);
 		view.addObject("userInfo",u);
@@ -100,17 +100,15 @@ public class ManageController extends MultiActionController{
 	public void setlistViewPage(String listViewPage) {
 		this.listViewPage = listViewPage;
 	}
-	public void setinitAccountPage(String initAccountPage) {
-		this.initAccountPage = initAccountPage;
-	}
+	
 	public void setListViewPage(String listViewPage) {
 		this.listViewPage = listViewPage;
 	}
-	public void setInitAccountPage(String initAccountPage) {
-		this.initAccountPage = initAccountPage;
+	public void setInitMainURL(String initMainURL) {
+		this.initMainURL = initMainURL;
 	}
-	public void setSetupPage(String setupPage) {
-		this.setupPage = setupPage;
+	public void setSetupURL(String setupURL) {
+		this.setupURL = setupURL;
 	}
 	public void setSetupViewPage(String setupViewPage) {
 		this.setupViewPage = setupViewPage;

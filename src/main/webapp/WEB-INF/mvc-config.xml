@@ -77,9 +77,9 @@
 	<property name="pageManager">
 	<ref bean="pageManager"/>
 	</property>
-	<property name="initAccountPage"><value>manage?action=initAccount</value></property>
+	<property name="initMainURL"><value>manage?action=initAccountPage</value></property>
 	<property name="listViewPage"><value>list</value></property>
-	<property name="setupPage"><value>manage?action=setup</value></property>
+	<property name="setupURL"><value>manage?action=setup</value></property>
 	<property name="setupViewPage"><value>setup</value></property>
 	</bean>
 	

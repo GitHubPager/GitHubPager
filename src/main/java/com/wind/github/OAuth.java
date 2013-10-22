@@ -1,12 +1,11 @@
 package com.wind.github;
 
 
-
+import java.net.HttpURLConnection;
 import java.util.HashMap;
-
-
 import java.util.Map;
 import java.util.Random;
+import org.eclipse.egit.github.core.client.GitHubClient;
 
 
 
@@ -14,16 +13,37 @@ public class OAuth {
 	
 	private static String AUTHURL="https://github.com/login/oauth/authorize";
 	private static String ACCESSTOKENURL="/login/oauth/access_token";
+	private String scope;
 	private String clientId;
 	private String clientSecret;
+	private class GitHubOAuthClient extends GitHubClient
+	{
+        @Override
+        protected
+        HttpURLConnection configureRequest(final HttpURLConnection request)
+        {
+                super.configureRequest(request);
+                request.setRequestProperty(HEADER_ACCEPT,"application/json");
+                return request;
+        }
+        public GitHubOAuthClient(String hostname)
+        {
+                super(hostname);
+        }
+        @Override
+        protected String configureUri(final String uri) 
+        {
+                return uri;
+        }
+	}
 	
 	public String getOAuthRequestURL(String stateCode)
 	{
-		return String.format("%s?scope=repo,user&client_id=%s&state=%s", AUTHURL ,this.clientId,stateCode);
+		return String.format("%s?scope=%s&client_id=%s&state=%s", AUTHURL ,scope ,this.clientId,stateCode);
 	}
 	public String getAccessToken(String returnCode) throws Exception
 	{
-			OAuthClient client=new OAuthClient("github.com");
+			GitHubOAuthClient client=new GitHubOAuthClient("github.com");
 			Map<String,String> params=new HashMap<String,String>();
 			params.put("client_id", this.clientId);
 			params.put("client_secret", this.clientSecret);
@@ -54,6 +74,9 @@ public class OAuth {
 	}
 	public void setClientSecret(String clientSecret) {
 		this.clientSecret = clientSecret;
+	}
+	public void setScope(String scope) {
+		this.scope = scope;
 	}
 	
 
