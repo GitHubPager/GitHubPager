@@ -168,13 +168,23 @@ public class PageManager {
 		Commit commit=dService.getCommit(repo, commitSHA);
 		String treeSHA=commit.getTree().getSha();
 		List<TreeEntry> treeArray=dService.getTree(repo, treeSHA).getTree();
+		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB,accessToken);
+		return dService.getRawBlobAsString(repo, sha, UTF8ENCODING);
+	}
+	
+	/*
+	 * Search a repository for file or tree
+	 */
+	private String findBlobOrTreeFromRepository(List<TreeEntry> baseTree,Repository repo, String path, String refString, DataService dService, String type, String accessToken) throws Exception
+	{
+		
 		String []pathList={path};
 		if(path.contains("/"))
 		{
 			pathList=path.split("/");
 		}
-		List<TreeEntry> forTreeArray=treeArray;
-		String content=null;
+		List<TreeEntry> forTreeArray=baseTree;
+		String sha=null;
 		int i=1;
 		for(i=0;i<pathList.length;i++)
 		{
@@ -195,9 +205,11 @@ public class PageManager {
 					}
 					else
 					{
-						if(entry.getType().equals(TreeEntry.TYPE_BLOB))
+						
+						if(entry.getType().equals(type))
 						{
-							content=dService.getRawBlobAsString(repo, entry.getSha(),UTF8ENCODING);
+						
+							sha=entry.getSha();
 						}
 						else continue;
 					}
@@ -210,8 +222,25 @@ public class PageManager {
 				return null;
 			}
 		}
-		return content;
+		return sha;
+	}
 	
+	/*
+	 * Modify a file 
+	 */
+	void modifyFileInRepository(Repository repo, String path, String refString, String content,String accessToken) throws Exception
+	{
+		RawGitHubClient client=new RawGitHubClient();
+		client.setOAuth2Token(accessToken);
+		RawDataService dService=new RawDataService(client);
+		Reference ref=dService.getReference(repo,refString);
+		String commitSHA=ref.getObject().getSha();
+		Commit commit=dService.getCommit(repo, commitSHA);
+		String treeSHA=commit.getTree().getSha();
+		List<TreeEntry> treeArray=dService.getTree(repo, treeSHA).getTree();
+		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB,accessToken);
+		if(sha==null) throw new Exception("404 File Not Found");
+		
 	}
 	
 	/*
@@ -418,12 +447,6 @@ public class PageManager {
 		
 	} 
 	
-	
-	
-	public void changePageTemplate(Repository repo, String templateName,String accessToken)
-	{
-		
-	}
 	
 
 	
