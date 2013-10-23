@@ -47,6 +47,15 @@ public class PageManager {
 	private static String UTF8ENCODING="utf-8";
 	private static String COMMITMESSAGE="GitHubPager updated in ";
 	private static Logger logger=LoggerFactory.getLogger(PageManager.class);
+	
+	
+	/*
+	 * Create a auto generate commit message
+	 */
+	private String generateCommitMessage()
+	{
+		return COMMITMESSAGE+new Date().toString();
+	}
 	/*
 	 * 
 	 * Get User Basic Info.
@@ -233,6 +242,7 @@ public class PageManager {
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
 		RawDataService dService=new RawDataService(client);
+		RawContentsService cService=new RawContentsService(client);
 		Reference ref=dService.getReference(repo,refString);
 		String commitSHA=ref.getObject().getSha();
 		Commit commit=dService.getCommit(repo, commitSHA);
@@ -240,7 +250,7 @@ public class PageManager {
 		List<TreeEntry> treeArray=dService.getTree(repo, treeSHA).getTree();
 		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB,accessToken);
 		if(sha==null) throw new Exception("404 File Not Found");
-		
+		cService.updateFile(repo, path, refString, sha, generateCommitMessage(), content);
 	}
 	
 	/*
@@ -282,7 +292,7 @@ public class PageManager {
 		Commit commit=new Commit();
 		commit.setTree(tree);
 		commit.setParents(parentCommitList);
-		commit.setMessage(COMMITMESSAGE+new Date().toString());
+		commit.setMessage(generateCommitMessage());
 		commit=dService.createCommit(repo, commit);
 		logger.info("Try to edit reference");
 		ref.setRef(refString);
@@ -471,6 +481,7 @@ public class PageManager {
 			
 			//System.out.println(p.getFileFromRepositoryWithRawDataService(repo, "README.md", MASTERREF, accessToken));
 			System.out.println(p.getFileFromRepositroyWithDataService(repo, "README.md", MASTERREF, accessToken));
+			//p.modifyFileInRepository(repo, "README.md", MASTERREF, "testModify",accessToken);
 			/*p.isRepositoryPageCMSInit(repo, u, accessToken);*/
 			//p.createRepositoryBranch(repo, PAGEREF, accessToken);
 			//p.setupRepositoryPage(repo,u,accessToken);

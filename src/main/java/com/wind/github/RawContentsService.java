@@ -1,10 +1,7 @@
 package com.wind.github;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_CONTENTS;
-
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -29,16 +26,26 @@ public class RawContentsService extends ContentsService{
       	{
       		super(client);
       	}
-        public void createFile(Repository repo, String path, String ref, String commitMessage, File f) throws IOException
+        public void createFile(Repository repo, String path, String ref, String commitMessage, String content) throws IOException
         {
-                byte data[]=FileUtils.dumpFileIntoByteArray(f);
                 Map<String,Object> params=new HashMap<String,Object>();
                 params.put("path",path);
                 params.put("message", commitMessage);
                 params.put("branch", ref);
-                params.put("content", String.valueOf(Base64Coder.encode(data)));
+                params.put("content", (Base64Coder.encodeString(content)));
                 String uri=String.format("/repos/%s/contents/%s", repo.generateId(),path);
                 client.put(uri, params, Map.class);
+        }
+        public void updateFile(Repository repo, String path, String ref, String lastSHA ,String commitMessage, String content) throws Exception
+        {
+        	 Map<String,Object> params=new HashMap<String,Object>();
+             params.put("path",path);
+             params.put("message", commitMessage);
+             params.put("branch", ref);
+             params.put("content", (Base64Coder.encodeString(content)));
+             params.put("sha", lastSHA);
+             String uri=String.format("/repos/%s/contents/%s", repo.generateId(),path);
+             client.put(uri, params, Map.class);
         }
         public InputStream getRawFileAsStream(Repository repo, String path, String ref) throws Exception
         {
