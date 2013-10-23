@@ -16,6 +16,7 @@ import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.Reference;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryCommit;
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.TypedResource;
 
 import org.eclipse.egit.github.core.Tree;
@@ -33,6 +34,9 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.wind.utils.Base64Coder;
+import com.wind.utils.FileUtils;
 
 public class PageManager {
 	private static String PAGEPOSTFIX=".github.io";
@@ -136,8 +140,6 @@ public class PageManager {
 	
 	public boolean isRepositoryPageCMSInit(Repository repo,User u,String accessToken) throws Exception
 	{
-		ContentsService cService=new ContentsService();
-        cService.getClient().setOAuth2Token(accessToken);
         String refString;
         if(isAccountPage(u,repo))
         {
@@ -147,20 +149,11 @@ public class PageManager {
         {
         	refString=PAGEREF;
         }
-        try
-        {
-                cService.getContents(repo,PAGEENTRYFILE ,refString);
-                return true;
-        }
-        catch(IOException e)
-        {
-        		if(e.getMessage().contains("404"))
-        		{
-	                logger.info("Uninit repo of {}",u.getLogin());
-	                return false;
-        		}
-        		throw e;
-        }
+        String data=getSingleFileByContentsService(repo,PAGEENTRYFILE,refString,accessToken);
+        if(data==null)
+        	return false;
+        else
+        	return true;
 	}
 	public void setupRepositoryPage(Repository repo,User u,String accessToken) throws Exception
 	{
@@ -207,20 +200,26 @@ public class PageManager {
 		setupRepositoryPage(repo,u,accessToken);
 		
 	} 
-	public void commitFiles(File templatePath,Repository repo, String refString,String accessToken) throws Exception
+	
+	private void commitTreeToRepository(List<TreeEntry> treeArray, Repository repo,String refString,String accessToken) throws Exception
 	{
 		DataService dService=new DataService();
 		dService.getClient().setOAuth2Token(accessToken);
 		Reference ref=dService.getReference(repo, refString);
 		String lastCommitSHA=ref.getObject().getSha();
-		if(!templatePath.isDirectory()) throw new IOException("Template Path is not a directory");
-		List<TreeEntry> treeArray=new ArrayList<TreeEntry>();
-		logger.info("Try to build up commit tree");
-		File fileList[]=templatePath.listFiles();
-		for(File f:fileList)
+		/*List<TreeEntry> treeArray=new ArrayList<TreeEntry>();
+		if(base.isDirectory())
 		{
-			buildUpTree(f,repo,dService,treeArray);
+			File fileList[]=base.listFiles();
+			for(File f:fileList)
+			{
+				buildUpTree(f,repo,dService,treeArray);
+			}
 		}
+		else
+		{
+			buildUpTree(base,repo,dService,treeArray);
+		}*/
 		Tree tree=dService.createTree(repo, treeArray);
 		logger.info("Try to make up commit");
 		Commit parentCommit=new Commit();
@@ -241,13 +240,14 @@ public class PageManager {
 		ref.setObject(res);
 		dService.editReference(repo, ref);
 	}
-	private void buildUpTree(File f,Repository repo,DataService dService,List<TreeEntry> treeArray) throws Exception
+	
+	private void buildTreeByFile(File f,Repository repo,DataService dService,List<TreeEntry> treeArray) throws Exception
 	{
 		if(f.isFile())
 		{
 			Blob blob=new Blob();
 			blob.setEncoding(UTF8ENCODING);
-			String content=dumpFileIntoString(f);
+			String content=FileUtils.dumpFileIntoString(f,UTF8ENCODING);
 			if(content==null) return;
 			blob.setContent(content);
 			String sha=dService.createBlob(repo, blob);
@@ -265,7 +265,7 @@ public class PageManager {
 			File subFiles[]=f.listFiles();
 			for(File subFile:subFiles)
 			{
-				buildUpTree(subFile,repo,dService,subTreeArray);
+				buildTreeByFile(subFile,repo,dService,subTreeArray);
 			}
 			Tree tree=dService.createTree(repo, subTreeArray);
 			TreeEntry entry=new TreeEntry();
@@ -276,44 +276,58 @@ public class PageManager {
 			treeArray.add(entry);
 		}
 	}
-	private String dumpFileIntoString(File f)
+	
+	public void changePageTemplate(Repository repo, String templateName,String accessToken)
 	{
-		ByteArrayOutputStream byteStream=null;
-		BufferedInputStream fileStream=null;
+		
+	}
+	public void createSingleFileByContentsService(Repository repo, String path, String refStr, File f,String accessToken) throws Exception
+	{
+		ContentsServiceEx cService=new ContentsServiceEx();
+		cService.getClient().setOAuth2Token(accessToken);
+		cService.createFile(repo, path, refStr, COMMITMESSAGE+new Date().toString(), f);
+	}
+	public String getSingleFileByContentsService(Repository repo, String path, String refStr,String accessToken) throws Exception
+	{
+		ContentsServiceEx cService=new ContentsServiceEx();
+		cService.getClient().setOAuth2Token(accessToken);
 		try
 		{
-			byteStream=new ByteArrayOutputStream();
-			fileStream=new BufferedInputStream(new FileInputStream(f));
-			int data=-1;
-			while((data=fileStream.read())!=-1)
+			List<RepositoryContents> rcList=cService.getContents(repo, path, refStr);
+			RepositoryContents rc=rcList.get(0);
+			
+			if(rc.getEncoding().equals(RepositoryContents.ENCODING_BASE64))
 			{
-				byteStream.write(data);
+				System.out.println("Ready");
+				return Base64Coder.decodeString(rc.getContent());
 			}
-			byte[]raw= byteStream.toByteArray();
-			return new String(raw,UTF8ENCODING);
+			else
+			{
+				return rc.getContent();
+			}
 		}
 		catch(IOException e)
-		{
-			logger.error("Error when dump file {} into String",f.getAbsolutePath());
-			return null;
-		}
-		finally
-		{
-			try
-			{
-				fileStream.close();
-			}
-			catch(IOException ex)
-			{
-				
-			}
-		}
+        {
+        		if(e.getMessage().contains("404"))
+        		{
+	                logger.info("File not found in repository {}",path);
+	                return null;
+        		}
+        		throw e;
+        }
 	}
+	public void modifySingleFileByContentsService(Repository repo, String path, String refStr,String accessToken) throws Exception
+	{
+		
+	}
+	
 	public static void main(String args[])
 	{
 		String accessToken="0a65f880b9dc9b28781e0afdb8faf48d6c22373d";
 		try
 		{
+			
+			
 			PageManager p=new PageManager();
 			User u=p.getBasicUserInfo(accessToken);
 			List<Repository> repoList=p.getUserRepositories(accessToken);
@@ -321,13 +335,15 @@ public class PageManager {
 			{
 				p.initAccountPage(u, accessToken);
 				logger.info("Init Account Page");
+				repoList=p.getUserRepositories(accessToken);
 			}
-			repoList=p.getUserRepositories(accessToken);
 			Repository repo=repoList.get(0);
+			//p.createSingleFileByContentsService(repo,"test1", MASTERREF, new File("c:/test1.txt"), accessToken);
+			System.out.println(p.getSingleFileByContentsService(repo, "README.md", MASTERREF, accessToken));
 			/*p.isRepositoryPageCMSInit(repo, u, accessToken);*/
 			//p.createRepositoryBranch(repo, PAGEREF, accessToken);
 			//p.setupRepositoryPage(repo,u,accessToken);
-			p.commitFiles(new File("c:/test"), repo, PAGEREF, accessToken);
+			//p.commitFiles(new File("c:/test"), repo, PAGEREF, accessToken);
 			//p.deleteRepository(repo, accessToken);
 			 
 			/*p.createProjectPageBranch(repo, accessToken);
