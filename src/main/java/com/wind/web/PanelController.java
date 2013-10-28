@@ -137,7 +137,8 @@ public class PanelController extends MultiActionController{
 		}
 		return u;
 	}
-	public void setAddPostViewPage(String addPostViewPage) {
+	
+	public void setAddPostViewPage(String addPostViewPage) { 
 		this.addPostViewPage = addPostViewPage;
 	}
 

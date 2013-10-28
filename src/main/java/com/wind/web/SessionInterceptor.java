@@ -21,18 +21,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter{
 		response.sendRedirect(errorRedirectPage);
 		return false;
 	}
-	/*private boolean checkInit(HttpServletRequest request,HttpSession s)
-	{
-		String action=request.getParameter("action");
-		if(action!=null&&!action.equals("init"))
-		{
-			if(s.getAttribute(WebConstants.INITFLAG)==null)
-			{
-				return false;
-			}
-		}
-		return true;
-	}*/
+	
 	private boolean checkAccessToken(HttpSession s)
 	{
 		if(s!=null)

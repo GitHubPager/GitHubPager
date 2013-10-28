@@ -1,5 +1,6 @@
 package com.wind.github;
 import java.io.File;
+
 import java.io.InputStream;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ import org.eclipse.egit.github.core.TreeEntry;
 import org.eclipse.egit.github.core.User;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GsonUtils;
 
 
@@ -45,6 +47,7 @@ import org.springframework.cache.annotation.Cacheable;
 import com.google.gson.Gson;
 import com.wind.github.page.ArticleEntry;
 import com.wind.github.page.ArticleSet;
+import com.wind.github.page.Settings;
 
 import com.wind.github.page.Template;
 import com.wind.utils.FileUtils;
@@ -73,6 +76,24 @@ public class PageManager {
 		return uService.getUser();
 	}
 	
+	public boolean checkVerifedEmail(String accessToken) throws Exception
+	{
+		RawGitHubClient client=new RawGitHubClient();
+		client.setOAuth2Token(accessToken);
+		GitHubRequest request=new GitHubRequest();
+		request.setType(List.class);
+		request.setUri("/user/emails");
+		String result=FileUtils.dumpInputStreamIntoString(client.getStream(request),GitHubConstants.UTF8ENCODING);
+		System.out.println(result);
+		if(result.contains("\"verified\":true"))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 	/*
 	 * Get A Repository From Name
 	 */
@@ -629,7 +650,41 @@ public class PageManager {
 			refString=GitHubConstants.MASTERREF;
 		}
 		String json=this.getRawFileFromRepository(repo, GitHubConstants.ARTICLEDIR+id, refString, accessToken);
+		Gson gson=GsonUtils.createGson();
+		return gson.fromJson(json, ArticleEntry.class);
 	}
+	
+	/*
+	 * Edit A Setting
+	 */
+	public void editSettings(Repository repo,Settings settings,String accessToken) throws Exception
+	{
+		String refString=GitHubConstants.PAGEREF;
+		if(isAccountPage(repo))
+		{
+			refString=GitHubConstants.MASTERREF;
+		}
+		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.SETTINGSFILE, refString, accessToken);
+		Gson gson=GsonUtils.createGson();
+		String settingsJson=gson.toJson(settings);
+		this.modifyFileInRepository(repo, GitHubConstants.SETTINGSFILE, refString, settingsJson, contents.getSha(), accessToken);
+	}
+	
+	/*
+	 * Get Setting
+	 */
+	public Settings getSettings(Repository repo,String accessToken) throws Exception
+	{
+		String refString=GitHubConstants.PAGEREF;
+		if(isAccountPage(repo))
+		{
+			refString=GitHubConstants.MASTERREF;
+		}
+		String json=this.getRawFileFromRepository(repo, GitHubConstants.SETTINGSFILE,refString, accessToken);
+		Gson gson=GsonUtils.createGson();
+		return gson.fromJson(json, Settings.class);
+	}
+	
 	/*
 	 * Get Template From Repository
 	 */
@@ -728,14 +783,15 @@ public class PageManager {
 				logger.info("Init Account Page");
 				repoList=p.getUserRepositories(accessToken);
 			}
-			Repository repo=repoList.get(0);
+			System.out.println(p.checkVerifedEmail(accessToken));
+			/*Repository repo=repoList.get(0);
 			RepositoryContents c=p.getFileFromRepository(repo, "README.md", GitHubConstants.MASTERREF, accessToken);
-			p.modifyFileInRepository(repo, "README.md",  GitHubConstants.MASTERREF, "testbase64\n\nyrdy", c.getSha(), accessToken);
-			//p.createFileInRepository(repo, "data/article", GitHubConstants.MASTERREF, "{\"size\":1}", accessToken);
-			ArticleEntry entry=new ArticleEntry();
-			entry.setTitle("haha");
-			entry.setDate("sdas");
-			p.commitNewArticleEntry(repo, entry, accessToken);
+			//p.modifyFileInRepository(repo, "README.md",  GitHubConstants.MASTERREF, "testbase64\n\nyrdy", c.getSha(), accessToken);
+			p.createFileInRepository(repo, "index.html", GitHubConstants.MASTERREF, "<html><h1>hello</h1></html>", accessToken);
+			//ArticleEntry entry=new ArticleEntry();
+			//entry.setTitle("haha");
+			//entry.setDate("sdas");
+			//p.commitNewArticleEntry(repo, entry, accessToken);
 			//p.modifyFileInRepository(repo, "README.md", MASTERREF, "testModify",accessToken);
 			/*p.isRepositoryPageCMSInit(repo, u, accessToken);*/
 			//p.createRepositoryBranch(repo, PAGEREF, accessToken);

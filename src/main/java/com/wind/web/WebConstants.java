@@ -7,6 +7,7 @@ public class WebConstants {
 	public static String ERRORCODE="errorCode";
 	public static String USERINFOCODE="userInfoCode";
 	public static String INITFLAG="initFlag";
+	public static String VERIFIEDFLAG="verifedFlag";
 	public static int OAUTHNOTSYNCERRORCODE=0x1001;
 	public static int ACCESSTOKENREMOTEFAILED=0x1002;
 	public static int GETUSERREPOFAILED=0x1003;

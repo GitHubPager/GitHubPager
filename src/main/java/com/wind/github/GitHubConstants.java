@@ -8,5 +8,6 @@ public class GitHubConstants {
 	public static String UTF8ENCODING="utf-8";
 	public static String ARTICLESETFILE="data/article";
 	public static String ARTICLEDIR="data/";
+	public static String SETTINGSFILE="data/settings";
 	public static String COMMITMESSAGE="GitHubPager updated in ";
 }
