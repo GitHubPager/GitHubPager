@@ -1,11 +1,9 @@
 package com.wind.github;
 
-import java.io.BufferedInputStream;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;import java.io.InputStream;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,8 +14,7 @@ import org.eclipse.egit.github.core.Blob;
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.Reference;
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryContents;
+
 import org.eclipse.egit.github.core.TypedResource;
 
 import org.eclipse.egit.github.core.Tree;
@@ -28,15 +25,15 @@ import org.eclipse.egit.github.core.User;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
 
-import org.eclipse.egit.github.core.service.CommitService;
-import org.eclipse.egit.github.core.service.ContentsService;
+
 import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
-import com.wind.utils.Base64Coder;
 import com.wind.utils.FileUtils;
 
 public class PageManager {
@@ -60,6 +57,7 @@ public class PageManager {
 	 * 
 	 * Get User Basic Info.
 	 */
+	@Cacheable(value = "github",key="#accessToken + 'userInfo'")
 	public User getBasicUserInfo(String accessToken) throws Exception
 	{
 		UserService uService=new UserService();
@@ -68,9 +66,21 @@ public class PageManager {
 	}
 	
 	/*
+	 * Get A Repository From Name
+	 */
+	public Repository getStubRepository(User u,String repoName)
+	{
+		Repository repo=new Repository();
+		repo.setOwner(u);
+		repo.setName(repoName);
+		return repo;
+	}
+	
+	/*
 	 * Get Branch of Repository. You can check whether the repository is empty
 	 */
-	public List<Reference> getRepositoryRefs(Repository repo,String accessToken) throws Exception
+	
+	private List<Reference> getRepositoryRefs(Repository repo,String accessToken) throws Exception
 	{
 		DataService dService=new DataService();
 		dService.getClient().setOAuth2Token(accessToken);
@@ -94,6 +104,7 @@ public class PageManager {
 	/*
 	 * Return User's all Repositories
 	 */
+	@Cacheable(value = "github",key="#accessToken + 'repository'")
 	public List<Repository> getUserRepositories(String accessToken) throws Exception
 	{
 		RepositoryService rService=new RepositoryService();
@@ -104,7 +115,7 @@ public class PageManager {
 	/*
 	 * Delete repository
 	 */
-	public void deleteRepository(Repository repo,String accessToken) throws Exception
+	private void deleteRepository(Repository repo,String accessToken) throws Exception
 	{
 		GitHubClient client=new GitHubClient();
 		client.setOAuth2Token(accessToken);
@@ -115,7 +126,7 @@ public class PageManager {
 	/*
 	 * Create Repository
 	 */
-	public Repository createRepository(String repoName,String accessToken) throws Exception
+	private Repository createRepository(String repoName,String accessToken) throws Exception
 	{
 		GitHubClient client=new GitHubClient();
 		client.setOAuth2Token(accessToken);
@@ -129,7 +140,8 @@ public class PageManager {
 	/*
 	 * Create Branch
 	 */
-	public void createRepositoryBranch(Repository repo,String refString,String accessToken) throws Exception
+	
+	private void createRepositoryBranch(Repository repo,String refString,String accessToken) throws Exception
 	{
 		DataService dService=new DataService();
 		dService.getClient().setOAuth2Token(accessToken);
@@ -157,36 +169,40 @@ public class PageManager {
 	/*
 	 * Get A file from repository with raw content service
 	 */
-	public String getFileFromRepositoryWithRawDataService(Repository repo, String path, String ref,String accessToken) throws Exception
+	public String getFileFromRepositoryWithRawContentService(Repository repo, String path, String ref,String accessToken) throws Exception
 	{
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
 		RawContentsService rService=new RawContentsService(client);
+		logger.info("Try to get file using raw content service");
 		return rService.getRawFileAsString(repo, path, ref, UTF8ENCODING);
 	}
 	/*
 	 * Get A file from Repositroy with raw data service
 	 */
-	public String getFileFromRepositroyWithDataService(Repository repo, String path, String refString,String accessToken) throws Exception
+	public String getFileFromRepositroyWithRawDataService(Repository repo, String path, String refString,String accessToken) throws Exception
 	{
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
 		RawDataService dService=new RawDataService(client);
+		logger.info("Try to get file using raw data service");
 		Reference ref=dService.getReference(repo,refString);
 		String commitSHA=ref.getObject().getSha();
 		Commit commit=dService.getCommit(repo, commitSHA);
 		String treeSHA=commit.getTree().getSha();
 		List<TreeEntry> treeArray=dService.getTree(repo, treeSHA).getTree();
-		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB,accessToken);
+		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB);
+		if(sha==null) return null;
 		return dService.getRawBlobAsString(repo, sha, UTF8ENCODING);
 	}
+	
+	
 	
 	/*
 	 * Search a repository for file or tree
 	 */
-	private String findBlobOrTreeFromRepository(List<TreeEntry> baseTree,Repository repo, String path, String refString, DataService dService, String type, String accessToken) throws Exception
+	private String findBlobOrTreeFromRepository(List<TreeEntry> baseTree,Repository repo, String path, String refString, DataService dService, String type) throws Exception
 	{
-		
 		String []pathList={path};
 		if(path.contains("/"))
 		{
@@ -231,13 +247,37 @@ public class PageManager {
 				return null;
 			}
 		}
+		
 		return sha;
 	}
 	
 	/*
-	 * Modify a file 
+	 * Modify a file with raw data service with sha input.Recommended Method
 	 */
-	void modifyFileInRepository(Repository repo, String path, String refString, String content,String accessToken) throws Exception
+	
+	public void modifyFileInRepository(Repository repo, String path, String refString, String content,String sha,String accessToken) throws Exception
+	{
+		RawGitHubClient client=new RawGitHubClient();
+		client.setOAuth2Token(accessToken);
+		RawContentsService cService=new RawContentsService(client);
+		cService.updateFile(repo, path, refString, sha, generateCommitMessage(), content);
+	}
+	
+	/*
+	 * Delete a file with sha. Recommended Method
+	 */
+	public void deleteFileInRepository(Repository repo, String path, String refString,String sha,String accessToken) throws Exception
+	{
+		RawGitHubClient client=new RawGitHubClient();
+		client.setOAuth2Token(accessToken);
+		RawContentsService cService=new RawContentsService(client);
+		cService.deleteFile(repo, path, refString, sha, generateCommitMessage());
+	}
+	
+	/*
+	 * Modify a file with raw data service
+	 */
+	public void modifyFileInRepositoryWithoutSHA(Repository repo, String path, String refString, String content,String accessToken) throws Exception
 	{
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
@@ -248,17 +288,44 @@ public class PageManager {
 		Commit commit=dService.getCommit(repo, commitSHA);
 		String treeSHA=commit.getTree().getSha();
 		List<TreeEntry> treeArray=dService.getTree(repo, treeSHA).getTree();
-		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB,accessToken);
+		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB);
 		if(sha==null) throw new Exception("404 File Not Found");
 		cService.updateFile(repo, path, refString, sha, generateCommitMessage(), content);
 	}
 	
 	/*
-	 * Get A File From Repository
+	 * Delete a file
 	 */
-	String getFileFromRepository(Repository repo, String path, String refString,String accessToken)
+	public void deleteFileInRepositoryWithoutSHA(Repository repo, String path, String refString, String accessToken) throws Exception
 	{
-		return null;
+		RawGitHubClient client=new RawGitHubClient();
+		client.setOAuth2Token(accessToken);
+		RawDataService dService=new RawDataService(client);
+		RawContentsService cService=new RawContentsService(client);
+		Reference ref=dService.getReference(repo,refString);
+		String commitSHA=ref.getObject().getSha();
+		Commit commit=dService.getCommit(repo, commitSHA);
+		String treeSHA=commit.getTree().getSha();
+		List<TreeEntry> treeArray=dService.getTree(repo, treeSHA).getTree();
+		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB);
+		if(sha==null) throw new Exception("404 File Not Found");
+		cService.deleteFile(repo, path, refString, sha, generateCommitMessage());
+	}
+	
+	/*
+	 * Get A File From Repository. Try raw content service first. Then try raw data service.
+	 */
+	public String getFileFromRepository(Repository repo, String path, String refString,String accessToken) throws Exception
+	{
+		try
+		{
+			return this.getFileFromRepositoryWithRawContentService(repo, path, refString, accessToken);
+		}
+		catch(Exception ex)
+		{
+			logger.info("Try to get file using raw content service failed. May be too large. Try Raw data service");
+		}
+		return this.getFileFromRepositroyWithRawDataService(repo, path, refString, accessToken);
 	}
 	
 	/*
@@ -310,7 +377,7 @@ public class PageManager {
 	/*
 	 * Build A Tree According To a File Without basetree. For init cms.
 	 */
-	private void buildTreeByFile(File f,Repository repo,DataService dService,List<TreeEntry> treeArray) throws Exception
+	private void buildTreeRecusive(File f,Repository repo,DataService dService,List<TreeEntry> treeArray) throws Exception
 	{
 		if(f.isFile())
 		{
@@ -334,7 +401,7 @@ public class PageManager {
 			File subFiles[]=f.listFiles();
 			for(File subFile:subFiles)
 			{
-				buildTreeByFile(subFile,repo,dService,subTreeArray);
+				buildTreeRecusive(subFile,repo,dService,subTreeArray);
 			}
 			Tree tree=dService.createTree(repo, subTreeArray);
 			TreeEntry entry=new TreeEntry();
@@ -365,7 +432,7 @@ public class PageManager {
 	/*
 	 *  Make account able to host page.
 	 */
-	
+	@CacheEvict(value = "github",key="#accessToken + 'repository'")
 	public void initAccountPage(User u,String accessToken) throws Exception
 	{
 		createRepository(u.getLogin()+PAGEPOSTFIX,accessToken);
@@ -375,22 +442,22 @@ public class PageManager {
 	 * Check the repository is account page.
 	 */
 	
-	public boolean isAccountPage(User u,Repository repo)
+	public boolean isAccountPage(Repository repo)
 	{
-		return repo.getName().equals(u.getLogin().toLowerCase()+PAGEPOSTFIX);
+		return repo.getName().equals(repo.getOwner().getLogin().toLowerCase()+PAGEPOSTFIX);
 	}
 	
 	/*
 	 * Check CMS init or not.
 	 */
-	public boolean isRepositoryPageCMSInit(Repository repo,User u,String accessToken) throws Exception
+	public boolean isRepositoryPageCMSInit(Repository repo,String accessToken) throws Exception
 	{
 		
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
 		RawContentsService rService=new RawContentsService(client);
         String refString;
-        if(isAccountPage(u,repo))
+        if(isAccountPage(repo))
         {
         	refString=MASTERREF;
         }
@@ -408,7 +475,8 @@ public class PageManager {
 	/*
 	 * Set up page function before setting up cms.
 	 */
-	public void setupRepositoryPage(Repository repo,User u,String accessToken) throws Exception
+	
+	private void setupRepositoryPage(Repository repo,String accessToken) throws Exception
 	{
 		List<Reference> refList=getRepositoryRefs(repo,accessToken);
 		if(refList.size()==0)
@@ -421,7 +489,7 @@ public class PageManager {
 			repo=this.createRepository(repoName, accessToken);
 		}
 		String refString=null;
-		boolean isMain=isAccountPage(u,repo);
+		boolean isMain=isAccountPage(repo);
 		if(isMain)
 		{
 			refString=MASTERREF;
@@ -451,10 +519,10 @@ public class PageManager {
 	/*
 	 * Setup CMS
 	 */
-	public void setupRepositoryPageCMS(Repository repo, User u, Map<String,String> params,String accessToken) throws Exception
+	@CacheEvict(value = "github",key="#accessToken + 'repository'")
+	public void setupRepositoryPageCMS(Repository repo, Map<String,String> params,String accessToken) throws Exception
 	{
-		setupRepositoryPage(repo,u,accessToken);
-		
+		setupRepositoryPage(repo,accessToken);
 	} 
 	
 	
@@ -468,7 +536,10 @@ public class PageManager {
 			
 			
 			PageManager p=new PageManager();
+			long start=new Date().getTime();
 			User u=p.getBasicUserInfo(accessToken);
+			long end=new Date().getTime();
+			System.out.println(end-start);
 			List<Repository> repoList=p.getUserRepositories(accessToken);
 			if(!p.isAccountReadyForPage(u, repoList))
 			{
@@ -480,7 +551,11 @@ public class PageManager {
 			//p.createSingleFileByContentsService(repo,"test1", MASTERREF, new File("c:/test1.txt"), accessToken);
 			
 			//System.out.println(p.getFileFromRepositoryWithRawDataService(repo, "README.md", MASTERREF, accessToken));
-			System.out.println(p.getFileFromRepositroyWithDataService(repo, "README.md", MASTERREF, accessToken));
+			
+			for(int i=0;i<5;i++)
+			System.out.println(p.getFileFromRepository(repo, "README.md", MASTERREF, accessToken));
+			
+			
 			//p.modifyFileInRepository(repo, "README.md", MASTERREF, "testModify",accessToken);
 			/*p.isRepositoryPageCMSInit(repo, u, accessToken);*/
 			//p.createRepositoryBranch(repo, PAGEREF, accessToken);

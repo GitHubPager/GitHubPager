@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ehcache xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='http://ehcache.org/ehcache.xsd' updateCheck="false">
+    <defaultCache eternal='true' maxElementsInMemory='100' overflowToDisk='false' />
+    <cache name='github' maxElementsInMemory='256' eternal='false' overflowToDisk='false' />
+    <cache name='page' maxElementsInMemory='16' eternal='false' overflowToDisk='false' />
+</ehcache>

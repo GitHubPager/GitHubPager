@@ -13,13 +13,14 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import com.wind.github.PageManager;
 
-public class ManageController extends MultiActionController{
+public class PanelController extends MultiActionController{
 	PageManager pageManager;
 	
 	String listViewPage;
-	String initMainURL;
+	String initAccountPageURL;
 	String setupURL;
 	String setupViewPage;
+	String addPostViewPage;
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
@@ -28,7 +29,7 @@ public class ManageController extends MultiActionController{
 		List<Repository> repoArray=pageManager.getUserRepositories(accessToken);
 		if(repoArray.size()==0||!pageManager.isAccountReadyForPage(u, repoArray))
 		{
-			res.sendRedirect(initMainURL);
+			res.sendRedirect(initAccountPageURL);
 			return null;
 		}
 		ModelAndView view=new ModelAndView();
@@ -58,14 +59,16 @@ public class ManageController extends MultiActionController{
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
 		String repoName=req.getParameter("repoName");
-		/*if(pageManager.isRepositoryPageInit(repoName, u, accessToken))
+		Repository repo=pageManager.getStubRepository(u, repoName);
+		if(pageManager.isRepositoryPageCMSInit(repo, accessToken))
 		{
 			
 		}
 		else
 		{
 			res.sendRedirect(setupURL+"&repoName="+repoName);
-		}*/
+		}
+		
 		return null;
     }
 	public ModelAndView logout(HttpServletRequest req, 
@@ -83,14 +86,25 @@ public class ManageController extends MultiActionController{
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
 		String repoName=req.getParameter("repoName");
-		Repository repo=pageManager.getRepositoryByName(repoName, u,accessToken);
 		ModelAndView view=new ModelAndView();
-		view.addObject("repository", repo);
+		view.addObject("repository", repoName);
 		view.addObject("userInfo",u);
 		view.setViewName(setupViewPage);
 		return view;
     }
-	
+	public ModelAndView addPost(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+    {
+		HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repoName");
+		ModelAndView view=new ModelAndView();
+		view.addObject("repository", repoName);
+		view.addObject("userInfo",u);
+		view.setViewName(addPostViewPage);
+		return view;
+    }
 	public void setPageManager(PageManager pageManager) {
 		this.pageManager = pageManager;
 	}
@@ -104,8 +118,8 @@ public class ManageController extends MultiActionController{
 	public void setListViewPage(String listViewPage) {
 		this.listViewPage = listViewPage;
 	}
-	public void setInitMainURL(String initMainURL) {
-		this.initMainURL = initMainURL;
+	public void setInitAccountPageURL(String initAccountPageURL) {
+		this.initAccountPageURL = initAccountPageURL;
 	}
 	public void setSetupURL(String setupURL) {
 		this.setupURL = setupURL;
@@ -122,6 +136,9 @@ public class ManageController extends MultiActionController{
 			s.setAttribute(WebConstants.USERINFOCODE, u);
 		}
 		return u;
+	}
+	public void setAddPostViewPage(String addPostViewPage) {
+		this.addPostViewPage = addPostViewPage;
 	}
 
 }

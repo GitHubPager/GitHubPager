@@ -55,12 +55,12 @@ public final class setup_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${userInfo.getLogin()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
       out.write("</h1>\n");
       out.write("\t<h1>You are going to setup ");
-      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository.getName()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
+      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository}", java.lang.String.class, (PageContext)_jspx_page_context, null));
       out.write("</h1>\n");
       out.write("\t<form action=\"setup\" method=\"post\">\n");
       out.write("\t<input type=\"hidden\" name=\"action\" value=\"setup\"/>\n");
-      out.write("\t<input type=\"hidden\" name=\"rid\" value=\"");
-      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository.getId()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
+      out.write("\t<input type=\"hidden\" name=\"repoName\" value=\"");
+      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository}", java.lang.String.class, (PageContext)_jspx_page_context, null));
       out.write("\"/>\n");
       out.write("\t<label>Title:</label><input type=\"text\" name=\"title\"/><br>\n");
       out.write("\t<label>Description:</label><input type=\"text\" name=\"description\"/><br>\n");

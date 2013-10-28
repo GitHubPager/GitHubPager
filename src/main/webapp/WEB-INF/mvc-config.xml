@@ -18,11 +18,11 @@
         </property>
     </bean>
     
-    <bean id="manageUrlHandlerMapping"
+    <bean id="panelUrlHandlerMapping"
           class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="mappings">
             <props>
-            	<prop key="/manage">manageController</prop>
+            	<prop key="/panel">panelController</prop>
             </props>
         </property>
         <property name="interceptors">
@@ -54,14 +54,14 @@
 	
 	<bean id="oauthController" class="com.wind.web.OAuthController">
 	<property name="oauth"><ref bean="oauth"/></property>
-	<property name="successPage"><value>manage?action=list</value></property>
+	<property name="successPage"><value>panel?action=list</value></property>
 	</bean>
 	
 	<bean id="loginController" class="com.wind.web.LoginController">
 	<property name="oauth"><ref bean="oauth"/></property>
 	</bean>
 	
-	<bean id="manageParaMethodResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver"> 
+	<bean id="panelParaMethodResolver" class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver"> 
         <property name="paramName">
             <value>action</value>
         </property> 
@@ -70,17 +70,18 @@
         </property> 
     </bean> 
 	
-	<bean id="manageController" class="com.wind.web.ManageController">
+	<bean id="panelController" class="com.wind.web.PanelController">
 	<property name="methodNameResolver">
-	<ref bean="manageParaMethodResolver"/>
+	<ref bean="panelParaMethodResolver"/>
 	</property>
 	<property name="pageManager">
 	<ref bean="pageManager"/>
 	</property>
-	<property name="initMainURL"><value>manage?action=initAccountPage</value></property>
+	<property name="initAccountPageURL"><value>panel?action=initAccountPage</value></property>
 	<property name="listViewPage"><value>list</value></property>
-	<property name="setupURL"><value>manage?action=setup</value></property>
+	<property name="setupURL"><value>panel?action=setup</value></property>
 	<property name="setupViewPage"><value>setup</value></property>
+	<property name="addPostViewPage"><value>addPost</value></property>
 	</bean>
 	
 	<bean id="sessionInterceptor" class="com.wind.web.SessionInterceptor">

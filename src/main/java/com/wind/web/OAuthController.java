@@ -31,7 +31,7 @@ public class OAuthController implements Controller{
 		}
 		String accessToken=oauth.getAccessToken(code);
 		s.setAttribute(WebConstants.ACCESSTOKEN, accessToken);
-		System.out.println(accessToken);
+		
 		arg1.sendRedirect(successPage);
 		return null;
 	}

@@ -15,11 +15,11 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
             <pattern>%-5level %logger{0} - %msg%n</pattern>
         </encoder>
     </appender>
-
+	
 	<!--<logger name="org.hibernate" level="debug"/> -->
    <!-- Uncomment and add your logger here:
     <logger name="org.springframework.samples.service.service" level="debug"/> -->
-         
+    
     <root level="info">
         <appender-ref ref="console"/>
     </root>
