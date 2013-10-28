@@ -1,6 +1,7 @@
 package com.wind.github;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_CONTENTS;
+
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
 
 import java.io.File;
@@ -11,8 +12,9 @@ import java.util.HashMap;
 
 import java.util.Map;
 
-import com.wind.utils.Base64Coder;
 import com.wind.utils.FileUtils;
+
+import org.apache.commons.codec.binary.Base64;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
@@ -34,7 +36,7 @@ public class RawContentsService extends ContentsService{
                 params.put("path",path);
                 params.put("message", commitMessage);
                 params.put("branch", ref);
-                params.put("content", (Base64Coder.encodeString(content)));
+                params.put("content", Base64.encodeBase64String(content.getBytes(GitHubConstants.UTF8ENCODING)));
                 String uri=String.format("/repos/%s/contents/%s", repo.generateId(),path);
                 client.put(uri, params, Map.class);
         }
@@ -44,7 +46,7 @@ public class RawContentsService extends ContentsService{
              params.put("path",path);
              params.put("message", commitMessage);
              params.put("branch", ref);
-             params.put("content", (Base64Coder.encodeString(content)));
+             params.put("content", Base64.encodeBase64String(content.getBytes(GitHubConstants.UTF8ENCODING)));
              params.put("sha", lastSHA);
              String uri=String.format("/repos/%s/contents/%s", repo.generateId(),path);
              client.put(uri, params, null);
@@ -66,7 +68,8 @@ public class RawContentsService extends ContentsService{
                 params.put("path",path);
                 params.put("message", commitMessage);
                 params.put("branch", ref);
-                params.put("content", String.valueOf(Base64Coder.encode(data)));
+                
+                params.put("content", Base64.encodeBase64String(data));
                 String uri=String.format("/repos/%s/contents/%s", repo.generateId(),path);
                 client.put(uri, params, null);
         }

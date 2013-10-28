@@ -1,19 +1,25 @@
 package com.wind.github;
-
-
 import java.io.File;
+import java.io.InputStream;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.eclipse.egit.github.core.Blob;
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.Reference;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryContents;
 
 import org.eclipse.egit.github.core.TypedResource;
 
@@ -24,8 +30,10 @@ import org.eclipse.egit.github.core.TreeEntry;
 import org.eclipse.egit.github.core.User;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GsonUtils;
 
 
+import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
@@ -34,24 +42,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
+import com.google.gson.Gson;
+import com.wind.github.page.ArticleEntry;
+import com.wind.github.page.ArticleSet;
+
+import com.wind.github.page.Template;
 import com.wind.utils.FileUtils;
 
 public class PageManager {
-	private static String PAGEPOSTFIX=".github.io";
-	private static String PAGEENTRYFILE=".githubpager";
-	private static String MASTERREF="refs/heads/master";
-	private static String PAGEREF="refs/heads/gh-pages";
-	private static String UTF8ENCODING="utf-8";
-	private static String COMMITMESSAGE="GitHubPager updated in ";
-	private static Logger logger=LoggerFactory.getLogger(PageManager.class);
 	
+	private static Logger logger=LoggerFactory.getLogger(PageManager.class);
+	private String templateRepository;
 	
 	/*
 	 * Create a auto generate commit message
 	 */
 	private String generateCommitMessage()
 	{
-		return COMMITMESSAGE+new Date().toString();
+		return GitHubConstants.COMMITMESSAGE+new Date().toString();
 	}
 	/*
 	 * 
@@ -167,20 +175,56 @@ public class PageManager {
 	}
 	
 	/*
-	 * Get A file from repository with raw content service
+	 * Get A Raw file from repository with raw content service
 	 */
-	public String getFileFromRepositoryWithRawContentService(Repository repo, String path, String ref,String accessToken) throws Exception
+	public String getRawFileFromRepository(Repository repo, String path, String ref,String accessToken) throws Exception
 	{
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
 		RawContentsService rService=new RawContentsService(client);
 		logger.info("Try to get file using raw content service");
-		return rService.getRawFileAsString(repo, path, ref, UTF8ENCODING);
+		return rService.getRawFileAsString(repo, path, ref, GitHubConstants.UTF8ENCODING);
 	}
+	
+	/*
+	 * Get A Base64Encoded File
+	 */
+	public RepositoryContents getFileFromRepository(Repository repo, String path, String ref,String accessToken) throws Exception
+	{
+		
+		ContentsService rService=new ContentsService();
+		rService.getClient().setOAuth2Token(accessToken);
+		logger.info("Try to get file using common content service");
+		try
+		{
+			List<RepositoryContents> cList= rService.getContents(repo,path,ref);
+			return cList.get(0);
+		}
+		catch(IOException e)
+		{
+			if(e.getMessage().contains("404"))
+			{
+				return null;
+			}
+			throw e;
+		}
+	}
+	
+	/*
+	 * Create A File
+	 */
+	public void createFileInRepository(Repository repo, String path, String ref,String content,String accessToken) throws Exception
+	{
+		RawGitHubClient client=new RawGitHubClient();
+		client.setOAuth2Token(accessToken);
+		RawContentsService rService=new RawContentsService(client);
+		rService.createFile(repo, path, ref, this.generateCommitMessage(), content);
+	}
+	
 	/*
 	 * Get A file from Repositroy with raw data service
 	 */
-	public String getFileFromRepositroyWithRawDataService(Repository repo, String path, String refString,String accessToken) throws Exception
+	/*public String getFileFromRepositroyWithRawDataService(Repository repo, String path, String refString,String accessToken) throws Exception
 	{
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
@@ -194,14 +238,14 @@ public class PageManager {
 		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB);
 		if(sha==null) return null;
 		return dService.getRawBlobAsString(repo, sha, UTF8ENCODING);
-	}
+	}*/
 	
 	
 	
 	/*
 	 * Search a repository for file or tree
 	 */
-	private String findBlobOrTreeFromRepository(List<TreeEntry> baseTree,Repository repo, String path, String refString, DataService dService, String type) throws Exception
+	/*private String findBlobOrTreeFromRepository(List<TreeEntry> baseTree,Repository repo, String path, String refString, DataService dService, String type) throws Exception
 	{
 		String []pathList={path};
 		if(path.contains("/"))
@@ -251,8 +295,9 @@ public class PageManager {
 		return sha;
 	}
 	
+	
 	/*
-	 * Modify a file with raw data service with sha input.Recommended Method
+	 * Modify a file with raw content service with sha input.Recommended Method
 	 */
 	
 	public void modifyFileInRepository(Repository repo, String path, String refString, String content,String sha,String accessToken) throws Exception
@@ -277,7 +322,7 @@ public class PageManager {
 	/*
 	 * Modify a file with raw data service
 	 */
-	public void modifyFileInRepositoryWithoutSHA(Repository repo, String path, String refString, String content,String accessToken) throws Exception
+	/*public void modifyFileInRepositoryWithoutSHA(Repository repo, String path, String refString, String content,String accessToken) throws Exception
 	{
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
@@ -296,7 +341,7 @@ public class PageManager {
 	/*
 	 * Delete a file
 	 */
-	public void deleteFileInRepositoryWithoutSHA(Repository repo, String path, String refString, String accessToken) throws Exception
+	/*public void deleteFileInRepositoryWithoutSHA(Repository repo, String path, String refString, String accessToken) throws Exception
 	{
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
@@ -310,12 +355,12 @@ public class PageManager {
 		String sha=findBlobOrTreeFromRepository(treeArray,repo,path,refString,dService,TreeEntry.TYPE_BLOB);
 		if(sha==null) throw new Exception("404 File Not Found");
 		cService.deleteFile(repo, path, refString, sha, generateCommitMessage());
-	}
+	}*/
 	
 	/*
 	 * Get A File From Repository. Try raw content service first. Then try raw data service.
 	 */
-	public String getFileFromRepository(Repository repo, String path, String refString,String accessToken) throws Exception
+	/*public String getFileFromRepository(Repository repo, String path, String refString,String accessToken) throws Exception
 	{
 		try
 		{
@@ -326,7 +371,7 @@ public class PageManager {
 			logger.info("Try to get file using raw content service failed. May be too large. Try Raw data service");
 		}
 		return this.getFileFromRepositroyWithRawDataService(repo, path, refString, accessToken);
-	}
+	}*/
 	
 	/*
 	 * Write a commit with a tree
@@ -382,8 +427,8 @@ public class PageManager {
 		if(f.isFile())
 		{
 			Blob blob=new Blob();
-			blob.setEncoding(UTF8ENCODING);
-			String content=FileUtils.dumpFileIntoString(f,UTF8ENCODING);
+			blob.setEncoding(GitHubConstants.UTF8ENCODING);
+			String content=FileUtils.dumpFileIntoString(f,GitHubConstants.UTF8ENCODING);
 			if(content==null) return;
 			blob.setContent(content);
 			String sha=dService.createBlob(repo, blob);
@@ -421,7 +466,7 @@ public class PageManager {
 		String userName=u.getLogin().toLowerCase();
 		for(Repository repo:repos)
 		{
-			if(repo.getName().equals(userName+PAGEPOSTFIX))
+			if(repo.getName().equals(userName+GitHubConstants.PAGEPOSTFIX))
 			{
 				return true;
 			}
@@ -435,7 +480,7 @@ public class PageManager {
 	@CacheEvict(value = "github",key="#accessToken + 'repository'")
 	public void initAccountPage(User u,String accessToken) throws Exception
 	{
-		createRepository(u.getLogin()+PAGEPOSTFIX,accessToken);
+		createRepository(u.getLogin()+GitHubConstants.PAGEPOSTFIX,accessToken);
 	}
 	
 	/*
@@ -444,7 +489,7 @@ public class PageManager {
 	
 	public boolean isAccountPage(Repository repo)
 	{
-		return repo.getName().equals(repo.getOwner().getLogin().toLowerCase()+PAGEPOSTFIX);
+		return repo.getName().equals(repo.getOwner().getLogin().toLowerCase()+GitHubConstants.PAGEPOSTFIX);
 	}
 	
 	/*
@@ -453,19 +498,17 @@ public class PageManager {
 	public boolean isRepositoryPageCMSInit(Repository repo,String accessToken) throws Exception
 	{
 		
-		RawGitHubClient client=new RawGitHubClient();
-		client.setOAuth2Token(accessToken);
-		RawContentsService rService=new RawContentsService(client);
+		
         String refString;
         if(isAccountPage(repo))
         {
-        	refString=MASTERREF;
+        	refString=GitHubConstants.MASTERREF;
         }
         else
         {
-        	refString=PAGEREF;
+        	refString=GitHubConstants.PAGEREF;
         }
-        String data=rService.getRawFileAsString(repo,PAGEENTRYFILE,refString,UTF8ENCODING);
+        String data=this.getRawFileFromRepository(repo, GitHubConstants.PAGEENTRYFILE, refString, accessToken);
         if(data==null)
         	return false;
         else
@@ -492,11 +535,11 @@ public class PageManager {
 		boolean isMain=isAccountPage(repo);
 		if(isMain)
 		{
-			refString=MASTERREF;
+			refString=GitHubConstants.MASTERREF;
 		}
 		else
 		{
-			refString=PAGEREF;
+			refString=GitHubConstants.PAGEREF;
 		}
 		boolean foundRef=false;
 		for(Reference r:refList)
@@ -525,6 +568,144 @@ public class PageManager {
 		setupRepositoryPage(repo,accessToken);
 	} 
 	
+	/*
+	 * Write a article
+	 */
+	public void commitNewArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
+	{
+		String refString=GitHubConstants.PAGEREF;
+		if(isAccountPage(repo))
+		{
+			refString=GitHubConstants.MASTERREF;
+		}
+		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.ARTICLESETFILE, refString, accessToken);
+		String aSetJson=new String(Base64.decodeBase64(contents.getContent()),GitHubConstants.UTF8ENCODING);
+		Gson gson=GsonUtils.createGson();
+		ArticleSet aset=gson.fromJson(aSetJson, ArticleSet.class);
+		int id=aset.getSize()+1;
+		while(true)
+		{
+			if(this.getRawFileFromRepository(repo, GitHubConstants.ARTICLEDIR+id, refString, accessToken)!=null)
+			{
+				logger.info("Found a lost article {}",id);
+				id++;
+			}
+			else
+			{
+				break;
+			}
+		}
+		aset.setSize(id);
+		String entryJson=gson.toJson(entry);
+		String articleSetJson=gson.toJson(aset);
+		this.createFileInRepository(repo, GitHubConstants.ARTICLEDIR+id,refString, entryJson, accessToken);
+		this.modifyFileInRepository(repo, GitHubConstants.ARTICLESETFILE, refString, articleSetJson, contents.getSha(), accessToken);
+	}
+	
+	/*
+	 * Edit A Article. Mark deleted to remove
+	 */
+	public void editArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
+	{
+		String refString=GitHubConstants.PAGEREF;
+		if(isAccountPage(repo))
+		{
+			refString=GitHubConstants.MASTERREF;
+		}
+		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, accessToken);
+		Gson gson=GsonUtils.createGson();
+		String entryJson=gson.toJson(entry);
+		this.modifyFileInRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, entryJson, contents.getSha(), accessToken);
+	}
+	
+	/*
+	 * Get A Article
+	 */
+	public ArticleEntry getArticleEntry(Repository repo,long id,String accessToken) throws Exception
+	{
+		String refString=GitHubConstants.PAGEREF;
+		if(isAccountPage(repo))
+		{
+			refString=GitHubConstants.MASTERREF;
+		}
+		String json=this.getRawFileFromRepository(repo, GitHubConstants.ARTICLEDIR+id, refString, accessToken);
+	}
+	/*
+	 * Get Template From Repository
+	 */
+	@Cacheable(value = "template")
+	public List<Template> getTemplateListFromRepository() throws Exception
+	{
+		URL uri=new URL(templateRepository);
+		InputStream stream=(uri.openStream());
+		SAXReader saxReader = new SAXReader();
+		try
+		{
+			Document document = saxReader.read(stream);
+			Element element=document.getRootElement();
+			List<Template> result=new ArrayList<Template>();
+			Iterator<?> tempIt=element.elementIterator(Template.TEMPLATETAG);
+			while(tempIt.hasNext())
+			{
+				Element templateElement=(Element)tempIt.next();
+				Iterator<?> it=templateElement.elementIterator();
+				Template template=new Template();
+				while(it.hasNext())
+				{
+					Element t=(Element)it.next();
+					if(t.getName().equals(Template.NAMETAG))
+					{
+						template.setName(t.getTextTrim());
+					}
+					else if(t.getName().equals(Template.URLTAG))
+					{
+						template.setUrl(t.getTextTrim());
+					}
+					else if(t.getName().equals(Template.VERSIONTAG))
+					{
+						template.setVersion(t.getTextTrim());
+					}
+					else if(t.getName().equals(Template.IMAGETAG))
+					{
+						template.setImage(t.getTextTrim());
+					}
+					else if(t.getName().equals(Template.AUTHORTAG))
+					{
+						template.setAuthor(t.getTextTrim());
+					}
+					else if(t.getName().equals(Template.DESCRIPTIONTAG))
+					{
+						template.setDescription(t.getTextTrim());
+					}
+					else if(t.getName().equals(Template.DATETAG))
+					{
+						template.setDate(t.getTextTrim());
+					}
+					else
+					{
+						throw new Exception("Unable to parse template file");
+					}
+					result.add(template);
+				}
+			}
+			return result;
+		}
+		catch(Exception e)
+		{
+			throw e;
+		}
+		finally
+		{
+			try
+			{
+				stream.close();
+			}
+			catch(Exception exx)
+			{
+				
+			}
+		}
+	}
 	
 
 	
@@ -548,14 +729,13 @@ public class PageManager {
 				repoList=p.getUserRepositories(accessToken);
 			}
 			Repository repo=repoList.get(0);
-			//p.createSingleFileByContentsService(repo,"test1", MASTERREF, new File("c:/test1.txt"), accessToken);
-			
-			//System.out.println(p.getFileFromRepositoryWithRawDataService(repo, "README.md", MASTERREF, accessToken));
-			
-			for(int i=0;i<5;i++)
-			System.out.println(p.getFileFromRepository(repo, "README.md", MASTERREF, accessToken));
-			
-			
+			RepositoryContents c=p.getFileFromRepository(repo, "README.md", GitHubConstants.MASTERREF, accessToken);
+			p.modifyFileInRepository(repo, "README.md",  GitHubConstants.MASTERREF, "testbase64\n\nyrdy", c.getSha(), accessToken);
+			//p.createFileInRepository(repo, "data/article", GitHubConstants.MASTERREF, "{\"size\":1}", accessToken);
+			ArticleEntry entry=new ArticleEntry();
+			entry.setTitle("haha");
+			entry.setDate("sdas");
+			p.commitNewArticleEntry(repo, entry, accessToken);
 			//p.modifyFileInRepository(repo, "README.md", MASTERREF, "testModify",accessToken);
 			/*p.isRepositoryPageCMSInit(repo, u, accessToken);*/
 			//p.createRepositoryBranch(repo, PAGEREF, accessToken);
@@ -576,5 +756,8 @@ public class PageManager {
 		{
 			e.printStackTrace();
 		}
+	}
+	public void setTemplateRepository(String templateRepository) {
+		this.templateRepository = templateRepository;
 	}
 }
