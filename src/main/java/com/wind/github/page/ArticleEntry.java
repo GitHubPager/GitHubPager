@@ -2,7 +2,7 @@ package com.wind.github.page;
 
 public class ArticleEntry {
 	public long id=0;
-	public boolean deleted=false;
+
 	public String title;
 	public String content;
 	public String date;
@@ -44,10 +44,5 @@ public class ArticleEntry {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public boolean isDeleted() {
-		return deleted;
-	}
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+
 }

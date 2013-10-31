@@ -603,7 +603,15 @@ public class PageManager {
 		String aSetJson=new String(Base64.decodeBase64(contents.getContent()),GitHubConstants.UTF8ENCODING);
 		Gson gson=GsonUtils.createGson();
 		ArticleSet aset=gson.fromJson(aSetJson, ArticleSet.class);
-		int id=aset.getSize()+1;
+		int id=-1;
+		if(!aset.getIds().isEmpty())
+		{
+			id=aset.getIds().get(aset.getIds().size()-1)+1;
+		}
+		else
+		{
+			id=1;
+		}
 		while(true)
 		{
 			if(this.getRawFileFromRepository(repo, GitHubConstants.ARTICLEDIR+id, refString, accessToken)!=null)
@@ -616,7 +624,9 @@ public class PageManager {
 				break;
 			}
 		}
-		aset.setSize(id);
+		
+		aset.getIds().add(id);
+		entry.setId(id);
 		String entryJson=gson.toJson(entry);
 		String articleSetJson=gson.toJson(aset);
 		this.createFileInRepository(repo, GitHubConstants.ARTICLEDIR+id,refString, entryJson, accessToken);
@@ -624,7 +634,7 @@ public class PageManager {
 	}
 	
 	/*
-	 * Edit A Article. Mark deleted to remove
+	 * Edit A Article. 
 	 */
 	public void editArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
 	{
@@ -633,10 +643,32 @@ public class PageManager {
 		{
 			refString=GitHubConstants.MASTERREF;
 		}
+		
 		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, accessToken);
 		Gson gson=GsonUtils.createGson();
 		String entryJson=gson.toJson(entry);
 		this.modifyFileInRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, entryJson, contents.getSha(), accessToken);
+	}
+	
+	/*
+	 * Remove A Article. 
+	 */
+	public void removeArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
+	{
+		String refString=GitHubConstants.PAGEREF;
+		if(isAccountPage(repo))
+		{
+			refString=GitHubConstants.MASTERREF;
+		}
+		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, accessToken);
+		Gson gson=GsonUtils.createGson();
+		RepositoryContents setContents=this.getFileFromRepository(repo, GitHubConstants.ARTICLESETFILE, refString, accessToken);
+		String aSetJson=new String(Base64.decodeBase64(setContents.getContent()),GitHubConstants.UTF8ENCODING);
+		ArticleSet aset=gson.fromJson(aSetJson, ArticleSet.class);
+		aset.getIds().remove(entry.getId());
+		aSetJson=gson.toJson(aset);
+		this.deleteFileInRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, contents.getSha(), accessToken);
+		this.modifyFileInRepository(repo, GitHubConstants.ARTICLESETFILE, refString, aSetJson, setContents.getSha(), accessToken);
 	}
 	
 	/*
@@ -769,9 +801,31 @@ public class PageManager {
 		String accessToken="0a65f880b9dc9b28781e0afdb8faf48d6c22373d";
 		try
 		{
-			
-			
-			PageManager p=new PageManager();
+			ArticleEntry entry=new ArticleEntry();
+			entry.setAuthor("Wen");
+			entry.setContent("<h1>HelloWorld</h1>");
+			entry.setDate("2013/10/28");
+			entry.setId(1);
+			entry.setTag("test,develop");
+			entry.setTitle("Hello World");
+			System.out.println(GsonUtils.createGson().toJson(entry));
+			Settings set=new Settings();
+			set.setArticlePerPage(5);
+			set.setDescription("Hoho");
+			set.setDomain("www.githubpager.tk");
+			set.setFooter("HOHOHO");
+			set.setShowComment(false);
+			set.setShowSidebar(false);
+			set.setTitle("HOHOtitle");
+			System.out.println(GsonUtils.createGson().toJson(set));
+			ArticleSet aset=new ArticleSet();
+			for(int i=0;i<16;i++)
+			{
+				aset.getIds().add(i);
+			}
+			String result=GsonUtils.createGson().toJson(aset);
+			System.out.println(result);
+			/*PageManager p=new PageManager();
 			long start=new Date().getTime();
 			User u=p.getBasicUserInfo(accessToken);
 			long end=new Date().getTime();
