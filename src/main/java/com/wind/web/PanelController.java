@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import com.wind.github.PageManager;
+import com.wind.github.page.Settings;
 import com.wind.github.page.Template;
 
 public class PanelController extends MultiActionController{
@@ -110,8 +111,35 @@ public class PanelController extends MultiActionController{
 		view.addObject("userInfo",u);
 		view.addObject(templateList);
 		view.setViewName(setupViewPage);
-		
 		return view;
+    }
+	public ModelAndView commitSetup(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+    {
+		HttpSession s=req.getSession();
+	    final String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repositoryName");
+		String template=req.getParameter("template");
+		String title=req.getParameter("title");
+		String description=req.getParameter("description");
+		String domain=req.getParameter("domain");
+		final Settings setting=new Settings();
+		setting.setDescription(description);
+		setting.setDomain(domain);
+		setting.setTitle(title);
+		setting.setRepository(repoName);
+		setting.setTemplate(template);
+		final Repository repo=pageManager.getStubRepository(u, repoName);
+		Runnable runnable=new Runnable()
+		{
+			@Override
+			public void run() {	
+				pageManager.setupRepositoryPageCMS(repo, setting, accessToken);
+			}	
+		};
+		res.sendRedirect(req.getRequestURI());
+		return null;
     }
 	public ModelAndView addPost(HttpServletRequest req, 
             HttpServletResponse res) throws Exception

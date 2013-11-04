@@ -8,16 +8,14 @@ public class Settings {
 	public String domain;
 	public String subdomain;
 	public int articlePerPage=5;
-	public boolean showMenu=false;
 	public List<Menu> menus;
-	public boolean showSidebar=false;
-	public boolean showTwitter=false;
 	public String twitterID;
-	public boolean showFaceBook=false;
 	public String facebookID;
 	public String googleAnalyzerId;
-	public boolean showComment=false;
+	public String diqusId;
 	public String footer;
+	public String repository;
+	public String template;
 	public String getTitle() {
 		return title;
 	}
@@ -42,41 +40,17 @@ public class Settings {
 	public void setSubdomain(String subdomain) {
 		this.subdomain = subdomain;
 	}
-	public boolean isShowMenu() {
-		return showMenu;
-	}
-	public void setShowMenu(boolean showMenu) {
-		this.showMenu = showMenu;
-	}
 	public List<Menu> getMenus() {
 		return menus;
 	}
 	public void setMenus(List<Menu> menus) {
 		this.menus = menus;
 	}
-	public boolean isShowSidebar() {
-		return showSidebar;
-	}
-	public void setShowSidebar(boolean showSidebar) {
-		this.showSidebar = showSidebar;
-	}
-	public boolean isShowTwitter() {
-		return showTwitter;
-	}
-	public void setShowTwitter(boolean showTwitter) {
-		this.showTwitter = showTwitter;
-	}
 	public String getTwitterID() {
 		return twitterID;
 	}
 	public void setTwitterID(String twitterID) {
 		this.twitterID = twitterID;
-	}
-	public boolean isShowFaceBook() {
-		return showFaceBook;
-	}
-	public void setShowFaceBook(boolean showFaceBook) {
-		this.showFaceBook = showFaceBook;
 	}
 	public String getFacebookID() {
 		return facebookID;
@@ -96,16 +70,28 @@ public class Settings {
 	public void setFooter(String footer) {
 		this.footer = footer;
 	}
-	public boolean isShowComment() {
-		return showComment;
-	}
-	public void setShowComment(boolean showComment) {
-		this.showComment = showComment;
-	}
 	public int getArticlePerPage() {
 		return articlePerPage;
 	}
 	public void setArticlePerPage(int articlePerPage) {
 		this.articlePerPage = articlePerPage;
+	}
+	public String getDiqusId() {
+		return diqusId;
+	}
+	public void setDiqusId(String diqusId) {
+		this.diqusId = diqusId;
+	}
+	public String getRepository() {
+		return repository;
+	}
+	public void setRepository(String repository) {
+		this.repository = repository;
+	}
+	public String getTemplate() {
+		return template;
+	}
+	public void setTemplate(String template) {
+		this.template = template;
 	}
 }

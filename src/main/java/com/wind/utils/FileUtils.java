@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 public class FileUtils {
+	public static int TEMP_DIR_ATTEMPTS=128;
 	public static File downloadFileFromInternet(String remoteUrl) throws Exception
 	{
 		BufferedInputStream inputStream = null;
@@ -53,6 +54,21 @@ public class FileUtils {
 			}
 		}
 	}
+	public static File createTempDir() {
+		  File baseDir = new File(System.getProperty("java.io.tmpdir"));
+		  String baseName = System.currentTimeMillis() + "-";
+
+		  for (int counter = 0; counter < TEMP_DIR_ATTEMPTS; counter++) {
+		    File tempDir = new File(baseDir, baseName + counter);
+		    if (tempDir.mkdir()) 
+		    {
+		      return tempDir;
+		    }
+		  }
+		  throw new IllegalStateException("Failed to create directory within "
+		      + TEMP_DIR_ATTEMPTS + " attempts (tried "
+		      + baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ')');
+		}
 	public static String dumpInputStreamIntoString(InputStream f,String encoding) throws Exception
 	{
 		ByteArrayOutputStream byteStream=null;

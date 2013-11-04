@@ -1,8 +1,6 @@
 package com.wind.github;
 import java.io.File;
-
 import java.io.InputStream;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,20 +19,13 @@ import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.Reference;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
-
 import org.eclipse.egit.github.core.TypedResource;
-
 import org.eclipse.egit.github.core.Tree;
 import org.eclipse.egit.github.core.TreeEntry;
-
-
 import org.eclipse.egit.github.core.User;
-
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GsonUtils;
-
-
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.service.RepositoryService;
@@ -48,9 +39,9 @@ import com.google.gson.Gson;
 import com.wind.github.page.ArticleEntry;
 import com.wind.github.page.ArticleSet;
 import com.wind.github.page.Settings;
-
 import com.wind.github.page.Template;
 import com.wind.utils.FileUtils;
+import com.wind.utils.ZipUtils;
 
 public class PageManager {
 	
@@ -397,25 +388,15 @@ public class PageManager {
 	/*
 	 * Write a commit with a tree
 	 */
-	private void commitTreeToRepository(List<TreeEntry> treeArray, Repository repo,String refString,String accessToken) throws Exception
+	private void commitFileToRepository(File commitDirectory, Repository repo,String refString,String accessToken) throws Exception
 	{
 		DataService dService=new DataService();
 		dService.getClient().setOAuth2Token(accessToken);
 		Reference ref=dService.getReference(repo, refString);
 		String lastCommitSHA=ref.getObject().getSha();
-		/*List<TreeEntry> treeArray=new ArrayList<TreeEntry>();
-		if(base.isDirectory())
-		{
-			File fileList[]=base.listFiles();
-			for(File f:fileList)
-			{
-				buildUpTree(f,repo,dService,treeArray);
-			}
-		}
-		else
-		{
-			buildUpTree(base,repo,dService,treeArray);
-		}*/
+		List<TreeEntry> treeArray=new ArrayList<TreeEntry>();
+		for(File f:commitDirectory.listFiles())
+			buildTreeRecusive(f,repo,dService,treeArray);
 		Tree tree=dService.createTree(repo, treeArray);
 		logger.info("Try to make up commit");
 		Commit parentCommit=new Commit();
@@ -513,6 +494,20 @@ public class PageManager {
 		return repo.getName().equals(repo.getOwner().getLogin().toLowerCase()+GitHubConstants.PAGEPOSTFIX);
 	}
 	
+	private String getProperRefString(Repository repo)
+	{
+		 	String refString;
+	        if(isAccountPage(repo))
+	        {
+	        	refString=GitHubConstants.MASTERREF;
+	        }
+	        else
+	        {
+	        	refString=GitHubConstants.PAGEREF;
+	        }
+	        return refString;
+	}
+	
 	/*
 	 * Check CMS init or not.
 	 */
@@ -520,15 +515,7 @@ public class PageManager {
 	{
 		
 		
-        String refString;
-        if(isAccountPage(repo))
-        {
-        	refString=GitHubConstants.MASTERREF;
-        }
-        else
-        {
-        	refString=GitHubConstants.PAGEREF;
-        }
+        String refString=getProperRefString(repo);
         String data=this.getRawFileFromRepository(repo, GitHubConstants.PAGEENTRYFILE, refString, accessToken);
         if(data==null)
         	return false;
@@ -552,16 +539,7 @@ public class PageManager {
 			logger.warn("Try to rebuild the repository");
 			repo=this.createRepository(repoName, accessToken);
 		}
-		String refString=null;
-		boolean isMain=isAccountPage(repo);
-		if(isMain)
-		{
-			refString=GitHubConstants.MASTERREF;
-		}
-		else
-		{
-			refString=GitHubConstants.PAGEREF;
-		}
+		String refString=getProperRefString(repo);
 		boolean foundRef=false;
 		for(Reference r:refList)
 		{
@@ -583,10 +561,16 @@ public class PageManager {
 	/*
 	 * Setup CMS
 	 */
-	@CacheEvict(value = "github",key="#accessToken + 'repository'")
-	public void setupRepositoryPageCMS(Repository repo, Map<String,String> params,String accessToken) throws Exception
+	
+	public void setupRepositoryPageCMS(Repository repo, Settings setting,String accessToken) throws Exception
 	{
 		setupRepositoryPage(repo,accessToken);
+		String template=setting.getTemplate();
+		File templateFile=FileUtils.downloadFileFromInternet(template);
+		File outputDir=FileUtils.createTempDir();
+		ZipUtils.unzip(templateFile, outputDir);
+		this.commitFileToRepository(outputDir, repo, this.getProperRefString(repo), accessToken);
+		this.editSettings(repo, setting, accessToken);
 	} 
 	
 	/*
@@ -594,11 +578,7 @@ public class PageManager {
 	 */
 	public void commitNewArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
 	{
-		String refString=GitHubConstants.PAGEREF;
-		if(isAccountPage(repo))
-		{
-			refString=GitHubConstants.MASTERREF;
-		}
+		String refString=this.getProperRefString(repo);
 		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.ARTICLESETFILE, refString, accessToken);
 		String aSetJson=new String(Base64.decodeBase64(contents.getContent()),GitHubConstants.UTF8ENCODING);
 		Gson gson=GsonUtils.createGson();
@@ -638,11 +618,7 @@ public class PageManager {
 	 */
 	public void editArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
 	{
-		String refString=GitHubConstants.PAGEREF;
-		if(isAccountPage(repo))
-		{
-			refString=GitHubConstants.MASTERREF;
-		}
+		String refString=getProperRefString(repo);
 		
 		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, accessToken);
 		Gson gson=GsonUtils.createGson();
@@ -655,11 +631,7 @@ public class PageManager {
 	 */
 	public void removeArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
 	{
-		String refString=GitHubConstants.PAGEREF;
-		if(isAccountPage(repo))
-		{
-			refString=GitHubConstants.MASTERREF;
-		}
+		String refString=getProperRefString(repo);
 		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, accessToken);
 		Gson gson=GsonUtils.createGson();
 		RepositoryContents setContents=this.getFileFromRepository(repo, GitHubConstants.ARTICLESETFILE, refString, accessToken);
@@ -676,11 +648,7 @@ public class PageManager {
 	 */
 	public ArticleEntry getArticleEntry(Repository repo,long id,String accessToken) throws Exception
 	{
-		String refString=GitHubConstants.PAGEREF;
-		if(isAccountPage(repo))
-		{
-			refString=GitHubConstants.MASTERREF;
-		}
+		String refString=getProperRefString(repo);
 		String json=this.getRawFileFromRepository(repo, GitHubConstants.ARTICLEDIR+id, refString, accessToken);
 		Gson gson=GsonUtils.createGson();
 		return gson.fromJson(json, ArticleEntry.class);
@@ -691,11 +659,7 @@ public class PageManager {
 	 */
 	public void editSettings(Repository repo,Settings settings,String accessToken) throws Exception
 	{
-		String refString=GitHubConstants.PAGEREF;
-		if(isAccountPage(repo))
-		{
-			refString=GitHubConstants.MASTERREF;
-		}
+		String refString=getProperRefString(repo);
 		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.SETTINGSFILE, refString, accessToken);
 		Gson gson=GsonUtils.createGson();
 		String settingsJson=gson.toJson(settings);
@@ -707,11 +671,7 @@ public class PageManager {
 	 */
 	public Settings getSettings(Repository repo,String accessToken) throws Exception
 	{
-		String refString=GitHubConstants.PAGEREF;
-		if(isAccountPage(repo))
-		{
-			refString=GitHubConstants.MASTERREF;
-		}
+		String refString=getProperRefString(repo);
 		String json=this.getRawFileFromRepository(repo, GitHubConstants.SETTINGSFILE,refString, accessToken);
 		Gson gson=GsonUtils.createGson();
 		return gson.fromJson(json, Settings.class);

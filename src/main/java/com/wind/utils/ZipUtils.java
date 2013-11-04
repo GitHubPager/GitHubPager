@@ -7,16 +7,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ZipUtils {
-	public static void unzip(File zipFile, String outputFolder){
+	public static void unzip(File zipFile, File outputFolder){
 		 
 	     byte[] buffer = new byte[1024];
 	     ZipInputStream zis=null;
 	     try{	 
-	    	//create output directory is not exists
-	    	File folder = new File(outputFolder);
-	    	if(!folder.exists()){
-	    		folder.mkdir();
-	    	}
+	    
 	    	//get the zip file content
 	    	zis = new ZipInputStream(new FileInputStream(zipFile));
 	    	//get the zipped file list entry
@@ -25,7 +21,7 @@ public class ZipUtils {
 	    	while(ze!=null)
 	    	{
 	    		String fileName = ze.getName();
-	            File newFile = new File(outputFolder + File.separator + fileName);
+	            File newFile = new File(outputFolder.getAbsolutePath() + File.separator + fileName);
 	  
 	            System.out.println("file unzip : "+ newFile.getAbsoluteFile());
 	  
