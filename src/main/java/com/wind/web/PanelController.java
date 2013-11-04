@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import com.wind.github.PageManager;
+import com.wind.github.page.Template;
 
 public class PanelController extends MultiActionController{
 	PageManager pageManager;
@@ -49,7 +50,8 @@ public class PanelController extends MultiActionController{
 		User u=getUserInfoViaSession(s,accessToken);
 		if(!pageManager.checkVerifedEmail(WebConstants.ACCESSTOKEN))
 		{
-			
+			res.sendRedirect(verifyMailUrl);
+			return null;
 		}
 		pageManager.initAccountPage(u, accessToken);
 		res.sendRedirect(req.getRequestURI());
@@ -82,7 +84,7 @@ public class PanelController extends MultiActionController{
 		}
 		else
 		{
-			res.sendRedirect(setupURL+"&repoName="+repoName);
+			res.sendRedirect(setupURL+"&repositoryName="+repoName);
 		}
 		
 		return null;
@@ -102,10 +104,13 @@ public class PanelController extends MultiActionController{
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
 		String repoName=req.getParameter("repositoryName");
+		List<Template> templateList=pageManager.getTemplateListFromRepository();
 		ModelAndView view=new ModelAndView();
 		view.addObject("repository", repoName);
 		view.addObject("userInfo",u);
+		view.addObject(templateList);
 		view.setViewName(setupViewPage);
+		
 		return view;
     }
 	public ModelAndView addPost(HttpServletRequest req, 
