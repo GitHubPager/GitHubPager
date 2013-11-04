@@ -48,7 +48,7 @@ public class PanelController extends MultiActionController{
 		HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
-		if(!pageManager.checkVerifedEmail(WebConstants.ACCESSTOKEN))
+		if(!pageManager.checkVerifedEmail(accessToken))
 		{
 			res.sendRedirect(verifyMailUrl);
 			return null;
