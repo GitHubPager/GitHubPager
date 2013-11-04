@@ -802,66 +802,7 @@ public class PageManager {
 		String accessToken="0a65f880b9dc9b28781e0afdb8faf48d6c22373d";
 		try
 		{
-			ArticleEntry entry=new ArticleEntry();
-			entry.setAuthor("Wen");
-			entry.setContent("<h1>HelloWorld</h1>");
-			entry.setDate("2013/10/28");
-			entry.setId(1);
-			entry.setTag("test,develop");
-			entry.setTitle("Hello World");
-			System.out.println(GsonUtils.createGson().toJson(entry));
-			Settings set=new Settings();
-			set.setArticlePerPage(5);
-			set.setDescription("Hoho");
-			set.setDomain("www.githubpager.tk");
-			set.setFooter("HOHOHO");
-			set.setShowComment(false);
-			set.setShowSidebar(false);
-			set.setTitle("HOHOtitle");
-			System.out.println(GsonUtils.createGson().toJson(set));
-			ArticleSet aset=new ArticleSet();
-			for(int i=0;i<16;i++)
-			{
-				aset.getIds().add(i);
-			}
-			String result=GsonUtils.createGson().toJson(aset);
-			System.out.println(result);
-			/*PageManager p=new PageManager();
-			long start=new Date().getTime();
-			User u=p.getBasicUserInfo(accessToken);
-			long end=new Date().getTime();
-			System.out.println(end-start);
-			List<Repository> repoList=p.getUserRepositories(accessToken);
-			if(!p.isAccountReadyForPage(u, repoList))
-			{
-				p.initAccountPage(u, accessToken);
-				logger.info("Init Account Page");
-				repoList=p.getUserRepositories(accessToken);
-			}
-			System.out.println(p.checkVerifedEmail(accessToken));
-			/*Repository repo=repoList.get(0);
-			RepositoryContents c=p.getFileFromRepository(repo, "README.md", GitHubConstants.MASTERREF, accessToken);
-			//p.modifyFileInRepository(repo, "README.md",  GitHubConstants.MASTERREF, "testbase64\n\nyrdy", c.getSha(), accessToken);
-			p.createFileInRepository(repo, "index.html", GitHubConstants.MASTERREF, "<html><h1>hello</h1></html>", accessToken);
-			//ArticleEntry entry=new ArticleEntry();
-			//entry.setTitle("haha");
-			//entry.setDate("sdas");
-			//p.commitNewArticleEntry(repo, entry, accessToken);
-			//p.modifyFileInRepository(repo, "README.md", MASTERREF, "testModify",accessToken);
-			/*p.isRepositoryPageCMSInit(repo, u, accessToken);*/
-			//p.createRepositoryBranch(repo, PAGEREF, accessToken);
-			//p.setupRepositoryPage(repo,u,accessToken);
-			//p.commitFiles(new File("c:/test"), repo, PAGEREF, accessToken);
-			//p.deleteRepository(repo, accessToken);
-			 
-			/*p.createProjectPageBranch(repo, accessToken);
 			
-			/*List<File> array=new ArrayList<File>();
-			array.add(new File("c:/eng000.txt"));
-			p.createProjectPageBranch(repo, accessToken);
-			p.commitFiles(array, repo, "master", accessToken);
-			p.initAccountPage(u, accessToken);
-			//p.initAccount(u, accessToken);*/
 		}
 		catch(Exception e)
 		{

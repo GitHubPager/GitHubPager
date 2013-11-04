@@ -11,7 +11,7 @@
 	<h1>User: ${userInfo.getLogin()}</h1>
 	<h1><a href="panel?action=logout">Logout</a></h1>
 	<c:forEach var="message" items="${repository}">
-		<h2><a href="panel?action=edit&repoName=${message.getName()}">${message.getName()}</a></h2>
+		<h2><a href="panel?action=manageRepository&repositoryName=${message.getName()}">${message.getName()}</a></h2>
 	</c:forEach>
 	</body>
 </html>

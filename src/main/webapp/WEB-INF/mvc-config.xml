@@ -28,7 +28,6 @@
         <property name="interceptors">
             <list>
                 <ref bean="sessionInterceptor"/>
-                <ref bean="mailStatusInterceptor"/>
             </list>
         </property>
     </bean>
@@ -78,24 +77,22 @@
 	<property name="pageManager">
 	<ref bean="pageManager"/>
 	</property>
-	<property name="initAccountPageURL"><value>panel?action=initAccountPage</value></property>
+	<property name="initAccountURL"><value>panel?action=initAccountPage</value></property>
 	<property name="listViewPage"><value>list</value></property>
 	<property name="setupURL"><value>panel?action=setup</value></property>
 	<property name="setupViewPage"><value>setup</value></property>
 	<property name="addPostViewPage"><value>addPost</value></property>
+	<property name="verifyMailUrl">
+	<value>https://github.com/settings/emails</value>
+	</property>
+	<property name="initAccountViewPage">
+	<value>initAccount</value>
+	</property>
 	</bean>
 	
 	<bean id="sessionInterceptor" class="com.wind.web.SessionInterceptor">
 	<property name="errorRedirectPage"><value>index</value></property>
 	</bean>
-	
-	<bean id="mailStatusInterceptor" class="com.wind.web.MailStatusInterceptor">
-	<property name="pageManager">
-	<ref bean="pageManager"/>
-	</property>
-	<property name="verifyMailUrl">
-	<value>https://github.com/settings/emails</value>
-	</property>
-	</bean>
+
 	
 </beans>

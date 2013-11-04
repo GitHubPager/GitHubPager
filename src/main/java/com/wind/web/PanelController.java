@@ -17,10 +17,13 @@ public class PanelController extends MultiActionController{
 	PageManager pageManager;
 	
 	String listViewPage;
-	String initAccountPageURL;
+	String initAccountViewPage;
+	String initAccountURL;
 	String setupURL;
 	String setupViewPage;
 	String addPostViewPage;
+	String verifyMailUrl;
+	
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
@@ -29,7 +32,7 @@ public class PanelController extends MultiActionController{
 		List<Repository> repoArray=pageManager.getUserRepositories(accessToken);
 		if(repoArray.size()==0||!pageManager.isAccountReadyForPage(u, repoArray))
 		{
-			res.sendRedirect(initAccountPageURL);
+			res.sendRedirect(initAccountURL);
 			return null;
 		}
 		ModelAndView view=new ModelAndView();
@@ -38,27 +41,40 @@ public class PanelController extends MultiActionController{
 		view.addObject("userInfo", u);
 		return view;
     }
-	public ModelAndView initAccountPage(HttpServletRequest req, 
+	public ModelAndView commitInitAccount(HttpServletRequest req, 
+    HttpServletResponse res) throws Exception
+    {
+		HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		if(!pageManager.checkVerifedEmail(WebConstants.ACCESSTOKEN))
+		{
+			
+		}
+		pageManager.initAccountPage(u, accessToken);
+		res.sendRedirect(req.getRequestURI());
+    	return null;
+    }
+	public ModelAndView initAccount(HttpServletRequest req, 
             HttpServletResponse res) throws Exception
 	{
 		
 		HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);	
-		
-		pageManager.initAccountPage(u, accessToken);
-		res.sendRedirect(req.getRequestURI());
-		return null;
-		
+		ModelAndView view=new ModelAndView();
+		view.setViewName(initAccountViewPage);
+		view.addObject("userInfo", u);
+		return view;
 	}
 	
-	public ModelAndView edit(HttpServletRequest req, 
+	public ModelAndView manageRepository(HttpServletRequest req, 
             HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
-		String repoName=req.getParameter("repoName");
+		String repoName=req.getParameter("repositoryName");
 		Repository repo=pageManager.getStubRepository(u, repoName);
 		if(pageManager.isRepositoryPageCMSInit(repo, accessToken))
 		{
@@ -85,7 +101,7 @@ public class PanelController extends MultiActionController{
 		HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
-		String repoName=req.getParameter("repoName");
+		String repoName=req.getParameter("repositoryName");
 		ModelAndView view=new ModelAndView();
 		view.addObject("repository", repoName);
 		view.addObject("userInfo",u);
@@ -98,7 +114,7 @@ public class PanelController extends MultiActionController{
 		HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
-		String repoName=req.getParameter("repoName");
+		String repoName=req.getParameter("repositoryName");
 		ModelAndView view=new ModelAndView();
 		view.addObject("repository", repoName);
 		view.addObject("userInfo",u);
@@ -118,8 +134,8 @@ public class PanelController extends MultiActionController{
 	public void setListViewPage(String listViewPage) {
 		this.listViewPage = listViewPage;
 	}
-	public void setInitAccountPageURL(String initAccountPageURL) {
-		this.initAccountPageURL = initAccountPageURL;
+	public void setInitAccountURL(String initAccountURL) {
+		this.initAccountURL = initAccountURL;
 	}
 	public void setSetupURL(String setupURL) {
 		this.setupURL = setupURL;
@@ -141,5 +157,11 @@ public class PanelController extends MultiActionController{
 	public void setAddPostViewPage(String addPostViewPage) { 
 		this.addPostViewPage = addPostViewPage;
 	}
-
+	public void setVerifyMailUrl(String verifyMailUrl) {
+		this.verifyMailUrl = verifyMailUrl;
+	}
+	public void setInitAccountViewPage(String initAccountViewPage) {
+		this.initAccountViewPage = initAccountViewPage;
+	}
+	
 }
