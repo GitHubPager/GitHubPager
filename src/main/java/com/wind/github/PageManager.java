@@ -772,8 +772,9 @@ public class PageManager {
 					{
 						throw new Exception("Unable to parse template file");
 					}
-					result.add(template);
+					
 				}
+				result.add(template);
 			}
 			return result;
 		}

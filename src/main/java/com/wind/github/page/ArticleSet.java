@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleSet {
-	List<Long> ids=new ArrayList<Long>();
+	List<Integer> ids=new ArrayList<Integer>();
 
-	public List<Long> getIds() {
+	public List<Integer> getIds() {
 		return ids;
 	}
 
-	public void setIds(List<Long> ids) {
+	public void setIds(List<Integer> ids) {
 		this.ids = ids;
 	}
 
