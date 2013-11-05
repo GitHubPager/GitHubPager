@@ -1,6 +1,7 @@
 package com.wind.web;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -131,13 +132,23 @@ public class PanelController extends MultiActionController{
 		setting.setRepository(repoName);
 		setting.setTemplate(template);
 		final Repository repo=pageManager.getStubRepository(u, repoName);
-		Runnable runnable=new Runnable()
+		Callable<Integer> task=new Callable<Integer>()
 		{
 			@Override
-			public void run() {	
-				pageManager.setupRepositoryPageCMS(repo, setting, accessToken);
+			public Integer call(){
+				try
+				{
+					pageManager.setupRepositoryPageCMS(repo, setting, accessToken);
+				}
+				catch(Exception e)
+				{
+					logger.error("Unable to setup repository page cms",e);
+					return WebConstants.BACKGROUNDWORKFAILED;
+				}
+				return WebConstants.BACKGROUNDWORKSUCCESS;
 			}	
 		};
+		GitHubWorkerPool.arrangeWorker(task,accessToken);
 		res.sendRedirect(req.getRequestURI());
 		return null;
     }
@@ -154,6 +165,7 @@ public class PanelController extends MultiActionController{
 		view.setViewName(addPostViewPage);
 		return view;
     }
+
 	public void setPageManager(PageManager pageManager) {
 		this.pageManager = pageManager;
 	}
@@ -196,5 +208,5 @@ public class PanelController extends MultiActionController{
 	public void setInitAccountViewPage(String initAccountViewPage) {
 		this.initAccountViewPage = initAccountViewPage;
 	}
-	
+
 }

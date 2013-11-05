@@ -13,4 +13,6 @@ public class WebConstants {
 	public static int GETUSERREPOFAILED=0x1003;
 	public static int GETUSERINFOFAILED=0x1004;
 	public static int INITACCOUNTFAILED=0x1005;
+	public static int BACKGROUNDWORKSUCCESS=0x1006;
+	public static int BACKGROUNDWORKFAILED=0x1007;
 }
