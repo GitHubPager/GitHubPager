@@ -100,7 +100,7 @@ public final class list_jsp extends org.apache.jasper.runtime.HttpJspBase
       if (_jspx_eval_c_forEach_0 != javax.servlet.jsp.tagext.Tag.SKIP_BODY) {
         do {
           out.write("\n");
-          out.write("\t\t<h2><a href=\"panel?action=edit&repoName=");
+          out.write("\t\t<h2><a href=\"panel?action=manageRepository&repositoryName=");
           out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${message.getName()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
           out.write('"');
           out.write('>');

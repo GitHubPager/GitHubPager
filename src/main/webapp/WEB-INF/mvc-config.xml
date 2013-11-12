@@ -10,6 +10,7 @@
           class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="mappings">
             <props>
+            	<prop key="/">indexController</prop>
             	<prop key="/index">indexController</prop>
                 <prop key="/about">aboutController</prop>
                 <prop key="/oauth">oauthController</prop>
@@ -89,6 +90,12 @@
 	</property>
 	<property name="initAccountViewPage">
 	<value>initAccount</value>
+	</property>
+	<property name="logoutPage">
+	<value>logout</value>
+	</property>
+	<property name="manageRepositoryPage">
+	<value>manageRepository</value>
 	</property>
 	</bean>
 	

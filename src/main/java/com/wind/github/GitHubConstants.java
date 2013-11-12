@@ -10,4 +10,6 @@ public class GitHubConstants {
 	public static String ARTICLEDIR="data/";
 	public static String SETTINGSFILE="data/settings";
 	public static String COMMITMESSAGE="GitHubPager updated in ";
+	public static String AUTHORUSER="elliott-wen";
+	public static String GITHUBPAGERREPOSITORY="GitHubPager/GitHubPager";
 }

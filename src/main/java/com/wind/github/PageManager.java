@@ -494,7 +494,7 @@ public class PageManager {
 		return repo.getName().equals(repo.getOwner().getLogin().toLowerCase()+GitHubConstants.PAGEPOSTFIX);
 	}
 	
-	private String getProperRefString(Repository repo)
+	public String getProperRefString(Repository repo)
 	{
 		 	String refString;
 	        if(isAccountPage(repo))
@@ -576,7 +576,7 @@ public class PageManager {
 	/*
 	 * Write a article
 	 */
-	public void commitNewArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
+	public void addNewArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
 	{
 		String refString=this.getProperRefString(repo);
 		RepositoryContents contents=this.getFileFromRepository(repo, GitHubConstants.ARTICLESETFILE, refString, accessToken);
@@ -676,6 +676,18 @@ public class PageManager {
 		Gson gson=GsonUtils.createGson();
 		return gson.fromJson(json, Settings.class);
 	}
+
+	/*
+	 * Get ArticleSet
+	 */
+	public ArticleSet getArticleSet(Repository repo,String accessToken) throws Exception
+	{
+		String refString=getProperRefString(repo);
+		String json=this.getRawFileFromRepository(repo, GitHubConstants.ARTICLESETFILE,refString, accessToken);
+		Gson gson=GsonUtils.createGson();
+		return gson.fromJson(json, ArticleSet.class);
+	}
+	
 	
 	/*
 	 * Get Template From Repository
@@ -755,7 +767,23 @@ public class PageManager {
 		}
 	}
 	
-
+	/*
+	 * Star Repository
+	 */
+	public void bonusGitHubPager(String accessToken) 
+	{
+		try
+		{
+			UserService uService=new UserService();
+			uService.getClient().setOAuth2Token(accessToken);
+			if(!uService.isFollowing(GitHubConstants.AUTHORUSER))
+				uService.follow(GitHubConstants.AUTHORUSER);
+		}
+		catch(Exception e)
+		{
+			
+		}
+	}
 	
 	public static void main(String args[])
 	{

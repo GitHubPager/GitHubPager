@@ -1,8 +1,10 @@
 package com.wind.web;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -13,6 +15,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import com.wind.github.PageManager;
+import com.wind.github.page.ArticleEntry;
+import com.wind.github.page.ArticleSet;
 import com.wind.github.page.Settings;
 import com.wind.github.page.Template;
 
@@ -26,7 +30,8 @@ public class PanelController extends MultiActionController{
 	String setupViewPage;
 	String addPostViewPage;
 	String verifyMailUrl;
-	
+	String logoutPage;
+	String manageRepositoryPage;
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
@@ -82,22 +87,55 @@ public class PanelController extends MultiActionController{
 		Repository repo=pageManager.getStubRepository(u, repoName);
 		if(pageManager.isRepositoryPageCMSInit(repo, accessToken))
 		{
+			int pid=0;
+			String page=req.getParameter("page");
+			if(page!=null&&!page.isEmpty()) pid=Integer.valueOf(page);
+			ArticleSet aset=pageManager.getArticleSet(repo, accessToken);
+			int setSize=aset.getIds().size();
+			List<Integer> ids=aset.getIds();
+			List<ArticleEntry> entrys=new ArrayList<ArticleEntry>();
+			int cid=0;
+			if(pid*WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE<setSize)
+			{
+				cid=pid*WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE;
+			}
+			int added=0;
+			while(true)
+			{
+				if(cid<setSize&&added<WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE)
+				{
+					ArticleEntry entry=pageManager.getArticleEntry(repo, ids.get(cid), accessToken);
+					entrys.add(entry);
+					added++;
+				}
+				else
+				{
+					break;
+				}
+			}
 			
+			ModelAndView view=new ModelAndView();
+			view.setViewName(manageRepositoryPage);
+			view.addObject("repository", repo);
+			view.addObject("userInfo", u);
+			return view;
 		}
 		else
 		{
 			res.sendRedirect(setupURL+"&repositoryName="+repoName);
+			return null;
 		}
 		
-		return null;
+		
     }
 	public ModelAndView logout(HttpServletRequest req, 
             HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
 		s.invalidate();
-		res.sendRedirect(req.getRequestURI());
-		return null;
+		ModelAndView view=new ModelAndView();
+		view.setViewName(logoutPage);
+		return view;
     }
 	public ModelAndView setup(HttpServletRequest req, 
             HttpServletResponse res) throws Exception
@@ -165,7 +203,7 @@ public class PanelController extends MultiActionController{
 		view.setViewName(addPostViewPage);
 		return view;
     }
-
+	
 	public void setPageManager(PageManager pageManager) {
 		this.pageManager = pageManager;
 	}
@@ -207,6 +245,12 @@ public class PanelController extends MultiActionController{
 	}
 	public void setInitAccountViewPage(String initAccountViewPage) {
 		this.initAccountViewPage = initAccountViewPage;
+	}
+	public void setLogoutPage(String logoutPage) {
+		this.logoutPage = logoutPage;
+	}
+	public void setManageRepositoryPage(String manageRepositoryPage) {
+		this.manageRepositoryPage = manageRepositoryPage;
 	}
 
 }
