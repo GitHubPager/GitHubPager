@@ -106,8 +106,12 @@ public class PanelController extends MultiActionController{
 				if(cid<setSize&&added<WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE)
 				{
 					ArticleEntry entry=pageManager.getArticleEntry(repo, ids.get(cid), accessToken);
+					if(entry!=null)
+					{
 					logger.info("load:"+entry.getId());
 					entrys.add(entry);
+					}
+					
 					added++;
 					cid++;
 				}
