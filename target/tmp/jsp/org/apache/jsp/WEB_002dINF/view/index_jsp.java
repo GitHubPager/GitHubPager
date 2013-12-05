@@ -41,15 +41,38 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
       _jspx_out = out;
       _jspx_resourceInjector = (org.glassfish.jsp.api.ResourceInjector) application.getAttribute("com.sun.appserv.jsp.resource.injector");
 
-      out.write("<html>\n");
-      out.write("\t<head>\n");
-      out.write("\t\t<meta charset=\"utf-8\">\n");
-      out.write("\t\t<title>Welcome</title>\n");
-      out.write("\t</head> \n");
-      out.write("\t<body>\n");
-      out.write("\t\t<h2>Hello</h2>\n");
-      out.write("\t\t<h2><a href=\"login\">Login</a></h2>\n");
-      out.write("\t</body>\n");
+      out.write("<!DOCTYPE html>\n");
+      out.write("<html lang=\"en\">\n");
+      out.write("    <head>\n");
+      out.write("        <title>GitHubPager!</title>\n");
+      out.write("        <meta charset=\"UTF-8\" />\n");
+      out.write("        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\"> \n");
+      out.write("        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">  \n");
+      out.write("        <meta name=\"keywords\" content=\"css3, transitions, menu, blur, navigation, typography, font, letters, text-shadow\" />\n");
+      out.write("        <meta name=\"author\" content=\"Codrops\" />\n");
+      out.write("        \n");
+      out.write("        <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/demo.css\" />\n");
+      out.write("        <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\" />\n");
+      out.write("\t\t<!--[if IE]>\n");
+      out.write("\t\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"css/styleIE.css\" />\n");
+      out.write("\t\t<![endif]-->\n");
+      out.write("        <link href='http://fonts.googleapis.com/css?family=Josefin+Slab' rel='stylesheet' type='text/css' />\n");
+      out.write("    </head>\n");
+      out.write("    <body style=\"background-image:  url(/images/pattern.png),url(/images/bg.jpg);\">\n");
+      out.write("        <div class=\"container\">\n");
+      out.write("            <h1>GitHubPager! <span>Easily blogging in GitHub</span></h1>\n");
+      out.write("            <div class=\"content\">\n");
+      out.write("                <ul class=\"bmenu\">\n");
+      out.write("                    <li><a href=\"login\">Start blogging in GitHub</a></li>\n");
+      out.write("                    <li><a href=\"about\">Instruction</a></li>\n");
+      out.write("                    <li><a href=\"https://github.com/GitHubPager/GitHubPager\">Project Development</a></li>\n");
+      out.write("                    <li><a href=\"https://github.com/GitHubPager/GitHubPager\">Theme Design</a></li>\n");
+      out.write("                    <li><a href=\"https://github.com/elliott-wen\">Contact</a></li>\n");
+      out.write("                </ul>\n");
+      out.write("            </div>\n");
+      out.write("        </div>\n");
+      out.write("        <script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js\"></script>\n");
+      out.write("    </body>\n");
       out.write("</html>");
     } catch (Throwable t) {
       if (!(t instanceof SkipPageException)){

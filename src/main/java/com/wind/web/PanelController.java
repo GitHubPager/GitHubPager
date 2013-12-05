@@ -29,6 +29,7 @@ public class PanelController extends MultiActionController{
 	String setupURL;
 	String setupViewPage;
 	String addPostViewPage;
+	String editPostViewPage;
 	String editSettingViewPage;
 	String verifyMailUrl;
 	String logoutPage;
@@ -228,6 +229,48 @@ public class PanelController extends MultiActionController{
 		res.sendRedirect(req.getRequestURI());
 		return null;
     }
+	public ModelAndView editPost(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+     {
+		HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repositoryName");
+		Repository repo=pageManager.getStubRepository(u, repoName);
+		String entryId=req.getParameter("entryId");
+		
+		ArticleEntry entry=pageManager.getArticleEntry(repo, Long.valueOf(entryId), accessToken);
+		ModelAndView view=new ModelAndView();
+		view.addObject("repository", repoName);
+		view.addObject("userInfo",u);
+		view.addObject("entry",entry);
+		view.setViewName(editPostViewPage);
+		return view;
+		
+     }
+	
+	
+	public ModelAndView commitEditPost(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+     {
+		HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repositoryName");
+		Repository repo=pageManager.getStubRepository(u, repoName);
+		String entryId=req.getParameter("entryId");
+		String title=req.getParameter("title");
+		String content=req.getParameter("content");
+		ArticleEntry entry=new ArticleEntry();
+		entry.setId(Long.valueOf(entryId));
+		entry.setContent(content);
+		entry.setAuthor(u.getName());
+		entry.setTitle(title);
+		//entry.setDate("Pending");
+		pageManager.editArticleEntry(repo, entry, accessToken);
+		res.sendRedirect(req.getRequestURI());
+		return null;
+     }
 	public ModelAndView commitAddPost(HttpServletRequest req, 
             HttpServletResponse res) throws Exception
     {
@@ -256,6 +299,7 @@ public class PanelController extends MultiActionController{
 		String repoName=req.getParameter("repositoryName");
 		Repository repo=pageManager.getStubRepository(u, repoName);
 		Settings setting=pageManager.getSettings(repo, accessToken);
+		
 		ModelAndView view=new ModelAndView();
 		view.addObject("repository", repo);
 		view.addObject("userInfo",u);
@@ -316,6 +360,9 @@ public class PanelController extends MultiActionController{
 	}
 	public void setEditSettingViewPage(String editSettingViewPage) {
 		this.editSettingViewPage = editSettingViewPage;
+	}
+	public void setEditPostViewPage(String editPostViewPage) {
+		this.editPostViewPage = editPostViewPage;
 	}
 
 }

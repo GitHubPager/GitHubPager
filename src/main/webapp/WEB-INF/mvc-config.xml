@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-
+	
     <bean id="basicUrlHandlerMapping"
           class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="mappings">
@@ -36,7 +36,9 @@
     </bean>
 
     <mvc:annotation-driven />
-
+	<mvc:resources mapping="/images/**" location="/resources/images/"/>
+	<mvc:resources mapping="/js/**" location="/resources/js/"/>
+	<mvc:resources mapping="/css/**" location="/resources/css/"/>
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 	        <!-- Example: a logical view name of 'showMessage' is mapped to '/WEB-INF/jsp/showMessage.jsp' -->
 	        <property name="prefix" value="/WEB-INF/view/"/>
@@ -85,6 +87,7 @@
 	<property name="setupURL"><value>panel?action=setup</value></property>
 	<property name="setupViewPage"><value>setup</value></property>
 	<property name="addPostViewPage"><value>addPost</value></property>
+	<property name="editPostViewPage"><value>editPost</value></property>
 	<property name="editSettingViewPage"><value>editSetting</value></property>
 	<property name="verifyMailUrl">
 	<value>https://github.com/settings/emails</value>
