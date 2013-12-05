@@ -17,7 +17,7 @@
 	<property name="scope"><value>repo,user,delete_repo</value></property>
 	</bean>
 	<bean id="pageManager" class="com.wind.github.PageManager">
-	<property name="templateRepository"><value>http://127.0.0.1/templates.xml</value></property>
+	<property name="templateRepository"><value>http://githubpager.github.io/templates.xml</value></property>
 	</bean>
 	
 	<cache:annotation-driven cache-manager="cacheManager"/>

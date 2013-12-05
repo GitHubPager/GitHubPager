@@ -85,6 +85,7 @@
 	<property name="setupURL"><value>panel?action=setup</value></property>
 	<property name="setupViewPage"><value>setup</value></property>
 	<property name="addPostViewPage"><value>addPost</value></property>
+	<property name="editSettingViewPage"><value>editSetting</value></property>
 	<property name="verifyMailUrl">
 	<value>https://github.com/settings/emails</value>
 	</property>

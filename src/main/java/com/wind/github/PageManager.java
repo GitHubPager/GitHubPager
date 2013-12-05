@@ -639,8 +639,9 @@ public class PageManager {
 		ArticleSet aset=gson.fromJson(aSetJson, ArticleSet.class);
 		aset.getIds().remove(entry.getId());
 		aSetJson=gson.toJson(aset);
-		this.deleteFileInRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, contents.getSha(), accessToken);
 		this.modifyFileInRepository(repo, GitHubConstants.ARTICLESETFILE, refString, aSetJson, setContents.getSha(), accessToken);
+		this.deleteFileInRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, contents.getSha(), accessToken);
+		
 	}
 	
 	/*

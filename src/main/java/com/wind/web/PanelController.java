@@ -29,6 +29,7 @@ public class PanelController extends MultiActionController{
 	String setupURL;
 	String setupViewPage;
 	String addPostViewPage;
+	String editSettingViewPage;
 	String verifyMailUrl;
 	String logoutPage;
 	String manageRepositoryPage;
@@ -105,8 +106,10 @@ public class PanelController extends MultiActionController{
 				if(cid<setSize&&added<WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE)
 				{
 					ArticleEntry entry=pageManager.getArticleEntry(repo, ids.get(cid), accessToken);
+					logger.info("load:"+entry.getId());
 					entrys.add(entry);
 					added++;
+					cid++;
 				}
 				else
 				{
@@ -116,8 +119,11 @@ public class PanelController extends MultiActionController{
 			
 			ModelAndView view=new ModelAndView();
 			view.setViewName(manageRepositoryPage);
-			view.addObject("repository", repo);
+			view.addObject("repository", repoName);
 			view.addObject("userInfo", u);
+			view.addObject("entrys",entrys);
+			view.addObject("currentPage",pid);
+			view.addObject("totalPage",aset.getIds().size()/WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE+1);
 			return view;
 		}
 		else
@@ -203,6 +209,58 @@ public class PanelController extends MultiActionController{
 		view.setViewName(addPostViewPage);
 		return view;
     }
+	public ModelAndView deletePost(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+    {
+		HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repositoryName");
+		Repository repo=pageManager.getStubRepository(u, repoName);
+		String entryId=req.getParameter("entryId");
+		ArticleEntry entry=new ArticleEntry();
+		entry.setId(Long.valueOf(entryId));
+		pageManager.removeArticleEntry(repo, entry, accessToken);
+		res.sendRedirect(req.getRequestURI());
+		return null;
+    }
+	public ModelAndView commitAddPost(HttpServletRequest req, 
+            HttpServletResponse res) throws Exception
+    {
+		HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repositoryName");
+		Repository repo=pageManager.getStubRepository(u, repoName);
+		String title=req.getParameter("title");
+		String content=req.getParameter("content");
+		final ArticleEntry entry=new ArticleEntry();
+		entry.setContent(content);
+		entry.setAuthor(u.getName());
+		entry.setTitle(title);
+		entry.setDate("Pending");
+		pageManager.addNewArticleEntry(repo, entry, accessToken);
+		res.sendRedirect(req.getRequestURI());
+		return null;
+    }
+	public ModelAndView editSetting(HttpServletRequest req, 
+    HttpServletResponse res) throws Exception
+    {
+    	HttpSession s=req.getSession();
+		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+		User u=getUserInfoViaSession(s,accessToken);
+		String repoName=req.getParameter("repositoryName");
+		Repository repo=pageManager.getStubRepository(u, repoName);
+		Settings setting=pageManager.getSettings(repo, accessToken);
+		ModelAndView view=new ModelAndView();
+		view.addObject("repository", repo);
+		view.addObject("userInfo",u);
+		view.addObject("setting",setting);
+		view.setViewName(editSettingViewPage);
+		return view;
+    }
+	
+	
 	
 	public void setPageManager(PageManager pageManager) {
 		this.pageManager = pageManager;
@@ -251,6 +309,9 @@ public class PanelController extends MultiActionController{
 	}
 	public void setManageRepositoryPage(String manageRepositoryPage) {
 		this.manageRepositoryPage = manageRepositoryPage;
+	}
+	public void setEditSettingViewPage(String editSettingViewPage) {
+		this.editSettingViewPage = editSettingViewPage;
 	}
 
 }
