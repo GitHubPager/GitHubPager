@@ -6,6 +6,7 @@
 *.exe
 *.o
 *.so
+*.war
 application-config.xml
 # Packages #
 ############
@@ -19,7 +20,6 @@ application-config.xml
 *.rar
 *.tar
 *.zip
-
 # Logs and databases #
 ######################
 *.log
