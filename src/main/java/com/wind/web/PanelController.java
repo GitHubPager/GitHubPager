@@ -1,10 +1,12 @@
 package com.wind.web;
 
+import java.util.Date;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,7 +35,8 @@ public class PanelController extends MultiActionController{
 	String editSettingViewPage;
 	String verifyMailUrl;
 	String logoutPage;
-	String manageRepositoryPage;
+	String manageRepositoryViewPage;
+	String manageRepositoryURL;
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
@@ -123,7 +126,7 @@ public class PanelController extends MultiActionController{
 			}
 			
 			ModelAndView view=new ModelAndView();
-			view.setViewName(manageRepositoryPage);
+			view.setViewName(manageRepositoryViewPage);
 			view.addObject("repository", repoName);
 			view.addObject("userInfo", u);
 			view.addObject("entrys",entrys);
@@ -167,37 +170,21 @@ public class PanelController extends MultiActionController{
             HttpServletResponse res) throws Exception
     {
 		HttpSession s=req.getSession();
-	    final String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+	    String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
 		User u=getUserInfoViaSession(s,accessToken);
 		String repoName=req.getParameter("repositoryName");
 		String template=req.getParameter("template");
 		String title=req.getParameter("title");
 		String description=req.getParameter("description");
 		String domain=req.getParameter("domain");
-		final Settings setting=new Settings();
+		Settings setting=new Settings();
 		setting.setDescription(description);
 		setting.setDomain(domain);
 		setting.setTitle(title);
 		setting.setRepository(repoName);
 		setting.setTemplate(template);
-		final Repository repo=pageManager.getStubRepository(u, repoName);
-		Callable<Integer> task=new Callable<Integer>()
-		{
-			@Override
-			public Integer call(){
-				try
-				{
-					pageManager.setupRepositoryPageCMS(repo, setting, accessToken);
-				}
-				catch(Exception e)
-				{
-					logger.error("Unable to setup repository page cms",e);
-					return WebConstants.BACKGROUNDWORKFAILED;
-				}
-				return WebConstants.BACKGROUNDWORKSUCCESS;
-			}	
-		};
-		GitHubWorkerPool.arrangeWorker(task,accessToken);
+		Repository repo=pageManager.getStubRepository(u, repoName);
+		pageManager.setupRepositoryPageCMS(repo, setting, accessToken);
 		res.sendRedirect(req.getRequestURI());
 		return null;
     }
@@ -224,9 +211,9 @@ public class PanelController extends MultiActionController{
 		Repository repo=pageManager.getStubRepository(u, repoName);
 		String entryId=req.getParameter("entryId");
 		ArticleEntry entry=new ArticleEntry();
-		entry.setId(Long.valueOf(entryId));
+		entry.setId(Integer.valueOf(entryId));
 		pageManager.removeArticleEntry(repo, entry, accessToken);
-		res.sendRedirect(req.getRequestURI());
+		res.sendRedirect(this.manageRepositoryURL+"&repositoryName="+repoName);
 		return null;
     }
 	public ModelAndView editPost(HttpServletRequest req, 
@@ -262,13 +249,13 @@ public class PanelController extends MultiActionController{
 		String title=req.getParameter("title");
 		String content=req.getParameter("content");
 		ArticleEntry entry=new ArticleEntry();
-		entry.setId(Long.valueOf(entryId));
+		entry.setId(Integer.valueOf(entryId));
 		entry.setContent(content);
 		entry.setAuthor(u.getName());
 		entry.setTitle(title);
 		//entry.setDate("Pending");
 		pageManager.editArticleEntry(repo, entry, accessToken);
-		res.sendRedirect(req.getRequestURI());
+		res.sendRedirect(this.manageRepositoryURL+"&repositoryName="+repoName);
 		return null;
      }
 	public ModelAndView commitAddPost(HttpServletRequest req, 
@@ -281,15 +268,15 @@ public class PanelController extends MultiActionController{
 		Repository repo=pageManager.getStubRepository(u, repoName);
 		String title=req.getParameter("title");
 		String content=req.getParameter("content");
-		if(title==null||content==null)
-			throw new Exception("Invalid Argument");
-		final ArticleEntry entry=new ArticleEntry();
+		ArticleEntry entry=new ArticleEntry();
 		entry.setContent(content);
 		entry.setAuthor(u.getName());
 		entry.setTitle(title);
-		entry.setDate("Pending");
+		SimpleDateFormat dateformat1=new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		  
+		entry.setDate(dateformat1.format(new Date()));
 		pageManager.addNewArticleEntry(repo, entry, accessToken);
-		res.sendRedirect(req.getRequestURI());
+		res.sendRedirect(this.manageRepositoryURL+"&repositoryName="+repoName);
 		return null;
     }
 	public ModelAndView editSetting(HttpServletRequest req, 
@@ -297,6 +284,7 @@ public class PanelController extends MultiActionController{
     {
     	HttpSession s=req.getSession();
 		String accessToken=(String)s.getAttribute(WebConstants.ACCESSTOKEN);
+	
 		User u=getUserInfoViaSession(s,accessToken);
 		String repoName=req.getParameter("repositoryName");
 		Repository repo=pageManager.getStubRepository(u, repoName);
@@ -345,6 +333,7 @@ public class PanelController extends MultiActionController{
 		return u;
 	}
 	
+	
 	public void setAddPostViewPage(String addPostViewPage) { 
 		this.addPostViewPage = addPostViewPage;
 	}
@@ -357,14 +346,17 @@ public class PanelController extends MultiActionController{
 	public void setLogoutPage(String logoutPage) {
 		this.logoutPage = logoutPage;
 	}
-	public void setManageRepositoryPage(String manageRepositoryPage) {
-		this.manageRepositoryPage = manageRepositoryPage;
+	public void setManageRepositoryViewPage(String manageRepositoryViewPage) {
+		this.manageRepositoryViewPage = manageRepositoryViewPage;
 	}
 	public void setEditSettingViewPage(String editSettingViewPage) {
 		this.editSettingViewPage = editSettingViewPage;
 	}
 	public void setEditPostViewPage(String editPostViewPage) {
 		this.editPostViewPage = editPostViewPage;
+	}
+	public void setManageRepositoryURL(String manageRepositoryURL) {
+		this.manageRepositoryURL = manageRepositoryURL;
 	}
 
 }

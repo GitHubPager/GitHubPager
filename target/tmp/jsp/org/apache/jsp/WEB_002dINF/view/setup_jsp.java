@@ -59,11 +59,17 @@ public final class setup_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("\t<head>\n");
       out.write("\t\t<meta charset=\"utf-8\">\n");
       out.write("\t\t<title>Welcome</title>\n");
+      out.write("\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"css/demo_1.css\" />\n");
+      out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style_1.css\" />\n");
+      out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/button.css\" />\n");
+      out.write("<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js\"></script>\n");
+      out.write("<script type=\"text/javascript\" src=\"js/jquery.backstretch.min.js\"></script>\n");
+      out.write("<link href='http://fonts.googleapis.com/css?family=Josefin+Slab:400,700' rel='stylesheet' type='text/css' />\n");
+      out.write("\t\t\n");
       out.write("\t</head> \n");
       out.write("\t<body>\n");
-      out.write("\t<h1>User: ");
-      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${userInfo.getLogin()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
-      out.write("</h1>\n");
+      out.write("\t<div id=\"container\">\n");
+      out.write("\t<h1>Welcome</h1>\n");
       out.write("\t<h1>You are going to setup ");
       out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository}", java.lang.String.class, (PageContext)_jspx_page_context, null));
       out.write("</h1>\n");
@@ -72,16 +78,24 @@ public final class setup_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("\t<input type=\"hidden\" name=\"repositoryName\" value=\"");
       out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository}", java.lang.String.class, (PageContext)_jspx_page_context, null));
       out.write("\"/>\n");
-      out.write("\t<label>Title:</label><input type=\"text\" name=\"title\"/><br>\n");
-      out.write("\t<label>Description:</label><input type=\"text\" name=\"description\"/><br>\n");
-      out.write("\t<label>Domain:</label><input type=\"text\" name=\"domain\"/><br>\n");
+      out.write("\t<h1><label>Title:</label><input type=\"text\" class=\"button\" name=\"title\"/></h1>\n");
+      out.write("\t<h1><label>Description:</label><input type=\"text\" class=\"button\" name=\"description\"/><br></h1>\n");
+      out.write("\t<h1><label>Theme:</label><select name=\"template\" class=\"button\">\n");
       out.write("\t");
       if (_jspx_meth_c_forEach_0(_jspx_page_context))
         return;
       out.write("\n");
-      out.write("\t<input type=\"submit\" value=\"Submit\"/>\n");
-      out.write("\t</form>\n");
+      out.write("\t</select></h1>\n");
+      out.write("\t<h1><input type=\"submit\" class=\"button\" value=\"Submit\"/></h1>\n");
       out.write("\t\n");
+      out.write("\t\n");
+      out.write("\t</form>\n");
+      out.write("\t</div>\n");
+      out.write("\t<script type=\"text/javascript\">\n");
+      out.write("            $(function() {\n");
+      out.write("\t\t\t\t$.backstretch(\"images/bg2.jpg\");\n");
+      out.write("            });\n");
+      out.write("\t</script>\n");
       out.write("\t</body>\n");
       out.write("</html>");
     } catch (Throwable t) {
@@ -113,16 +127,11 @@ public final class setup_jsp extends org.apache.jasper.runtime.HttpJspBase
       if (_jspx_eval_c_forEach_0 != javax.servlet.jsp.tagext.Tag.SKIP_BODY) {
         do {
           out.write("\n");
-          out.write("\t\t<input type=\"radio\" name=\"template\" value=\"");
+          out.write("\t\t<option value=\"");
           out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${template.getUrl()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
-          out.write("\" />\n");
-          out.write("\t\t<img src=\"");
-          out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${template.getImage()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
-          out.write("\"/>\n");
-          out.write("\t\t<h1>");
+          out.write("\" />");
           out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${template.getName()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
-          out.write("</h1>\n");
-          out.write("\t\t\n");
+          out.write("</option>\n");
           out.write("\t");
           int evalDoAfterBody = _jspx_th_c_forEach_0.doAfterBody();
           if (evalDoAfterBody != javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_AGAIN)

@@ -314,10 +314,12 @@ public class PageManager {
 	
 	public void modifyFileInRepository(Repository repo, String path, String refString, String content,String sha,String accessToken) throws Exception
 	{
+		logger.info("Try Modify:"+path+repo.getName()+refString);
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
 		RawContentsService cService=new RawContentsService(client);
 		cService.updateFile(repo, path, refString, sha, generateCommitMessage(), content);
+		
 	}
 	
 	/*
@@ -325,6 +327,7 @@ public class PageManager {
 	 */
 	public void deleteFileInRepository(Repository repo, String path, String refString,String sha,String accessToken) throws Exception
 	{
+		logger.info("Try Delete:"+path+repo.getName()+refString);
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
 		RawContentsService cService=new RawContentsService(client);
@@ -639,7 +642,7 @@ public class PageManager {
 		RepositoryContents setContents=this.getFileFromRepository(repo, GitHubConstants.ARTICLESETFILE, refString, accessToken);
 		String aSetJson=new String(Base64.decodeBase64(setContents.getContent()),GitHubConstants.UTF8ENCODING);
 		ArticleSet aset=gson.fromJson(aSetJson, ArticleSet.class);
-		aset.getIds().remove(entry.getId());
+		aset.getIds().remove(Integer.valueOf(entry.getId()));
 		aSetJson=gson.toJson(aset);
 		this.modifyFileInRepository(repo, GitHubConstants.ARTICLESETFILE, refString, aSetJson, setContents.getSha(), accessToken);
 		this.deleteFileInRepository(repo, GitHubConstants.ARTICLEDIR+entry.getId(), refString, contents.getSha(), accessToken);

@@ -20,7 +20,14 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     
-  
+   <error-page> 
+        <error-code>500</error-code> 
+        <location>/WEB-INF/view/error.jsp</location> 
+   </error-page>
+   <error-page> 
+        <error-code>404</error-code> 
+        <location>/WEB-INF/view/error.jsp</location> 
+  </error-page>
   	
     
     <!--

@@ -1,7 +1,7 @@
 package com.wind.github.page;
 
 public class ArticleEntry {
-	public long id=0;
+	public int id=0;
 
 	public String title;
 	public String content;
@@ -38,10 +38,10 @@ public class ArticleEntry {
 	public void setTag(String tag) {
 		this.tag = tag;
 	}
-	public long getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

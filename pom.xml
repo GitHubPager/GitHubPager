@@ -83,29 +83,16 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Hibernate -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-
 		
-		<!-- Test Artifacts -->
+		
+		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>${spring-framework.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-	
+			
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
@@ -132,6 +119,11 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.directory.studio</groupId>
+			<artifactId>org.dom4j.dom4j</artifactId>
+			<version>1.6.1</version>
 		</dependency>
 	</dependencies>	
 	<build>

@@ -15,7 +15,7 @@
                 <prop key="/about">aboutController</prop>
                 <prop key="/oauth">oauthController</prop>
                 <prop key="/login">loginController</prop>
-                <prop key="/status">statusController</prop>
+            
             </props>
         </property>
     </bean>
@@ -30,7 +30,7 @@
         <property name="interceptors">
             <list>
                 <ref bean="sessionInterceptor"/>
-                <ref bean="gitHubWorkerStatusInterceptor"/>
+                
             </list>
         </property>
     </bean>
@@ -98,26 +98,17 @@
 	<property name="logoutPage">
 	<value>logout</value>
 	</property>
-	<property name="manageRepositoryPage">
+	<property name="manageRepositoryViewPage">
 	<value>manageRepository</value>
 	</property>
-	</bean>
-	
-	<bean id="statusController" class="com.wind.web.StatusController">
-	<property name="busyViewPage">
-	<value>busy</value>
-	</property>
-	<property name="resultViewPage">
-	<value>result</value>
+	<property name="manageRepositoryURL">
+	<value>panel?action=manageRepository</value>
 	</property>
 	</bean>
 	
+
 	<bean id="sessionInterceptor" class="com.wind.web.SessionInterceptor">
 	<property name="errorRedirectPage"><value>index</value></property>
-	</bean>
-	<bean id="gitHubWorkerStatusInterceptor" class="com.wind.web.GitHubWorkerStatusInterceptor">
-	<property name="busyStatusUrl"><value>status?s=busy</value></property>
-	<property name="gotResultUrl"><value>status?s=result</value></property>
 	</bean>
 	
 </beans>

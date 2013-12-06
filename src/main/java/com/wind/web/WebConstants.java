@@ -8,6 +8,7 @@ public class WebConstants {
 	public static String USERINFOCODE="userInfoCode";
 	public static String INITFLAG="initFlag";
 	public static String VERIFIEDFLAG="verifedFlag";
+	public static String LASTVISITFLAG="historyPointFlag";
 	public static int POSTPERPAGEINMANAGEREPOSITORYPAGE=10;
 	public static int OAUTHNOTSYNCERRORCODE=0x1001;
 	public static int ACCESSTOKENREMOTEFAILED=0x1002;
