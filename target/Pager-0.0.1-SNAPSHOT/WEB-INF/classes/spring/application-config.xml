@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+    
+    <!-- Uncomment and add your base-package here:
+         <context:component-scan
+            base-package="org.springframework.samples.service"/>  -->
+	<bean id="oauth" class="com.wind.github.OAuth">
+	<property name="clientId"><value>5ecc1b6834b646d1510c</value></property>
+	<property name="clientSecret"><value>74091d7478b842b24236dc34d554689ebe339a42</value></property>
+	<property name="scope"><value>repo,user,delete_repo</value></property>
+	</bean>
+	<bean id="pageManager" class="com.wind.github.PageManager">
+	<property name="templateRepository"><value>http://githubpager.github.io/templates.xml</value></property>
+	</bean>
+	
+	<cache:annotation-driven cache-manager="cacheManager"/>
+
+ 
+ 	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+ 	<property name="cacheManager"><ref bean="ehcache"/></property>
+ 	</bean>
+ 	
+	<!-- EhCache library setup -->
+	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+	<property name="configLocation"><value>classpath:ehcache.xml</value></property>
+	<property name="shared"><value>false</value></property>
+	</bean>
+	
+
+	
+</beans>
