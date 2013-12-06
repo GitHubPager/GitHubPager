@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <ehcache xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='http://ehcache.org/ehcache.xsd' updateCheck="false">
     <defaultCache eternal='true' maxElementsInMemory='100' overflowToDisk='false' />
-    <cache name='github' maxElementsInMemory='4096' eternal='false' overflowToDisk='false' />
+    <cache name='github' maxElementsInMemory='4096' eternal='false' timeToIdleSeconds="60" overflowToDisk='false' />
     <cache name='template' maxElementsInMemory='2' eternal='false' overflowToDisk='false' />
 </ehcache>
