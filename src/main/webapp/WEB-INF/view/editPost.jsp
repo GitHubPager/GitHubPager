@@ -3,19 +3,16 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%> 
 <html>
 <head>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<script src="http://tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+<script src="http://tinymce.cachefly.net/4.0/tinymce.min.js"></script><script type="text/javascript" src="js/jquery.backstretch.min.js"></script>
 <script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropins.js" id="dropboxjs" data-app-key="bf1mlms18dgzf6g"></script>
-<script>
-$(function() {
-    $( "input[type=submit], a, button" )
-      .button();
-});
-</script>
+<link rel="stylesheet" type="text/css" href="css/demo_1.css" />
+<link rel="stylesheet" type="text/css" href="css/style_1.css" />
+<link rel="stylesheet" type="text/css" href="css/button.css" />
+ <link href='http://fonts.googleapis.com/css?family=Josefin+Slab:400,700' rel='stylesheet' type='text/css' />
 <script>
         tinymce.init({selector:'textarea',
+        height:600,
 		plugins: [
         "advlist autolink lists link image charmap print preview anchor",
         "searchreplace visualblocks code fullscreen",
@@ -26,16 +23,18 @@ $(function() {
 </script>
 </head>
 <body>
-<h1>User: ${userInfo.getLogin()}</h1>
-	<h1>Repository:${repository}</h1>
+<div class="container" style="width:60%;margin:auto;">
+<h1>Edit Post</h1>
 <form action="panel?action=commitEditPost" method="post">
-<label for="title">Title:</label><input type="text" name="title" value="${entry.getTitle()}" >
-<textarea name="content">${entry.getContent()}</textarea>
+<label for="title" class="button danger">Title:</label><input class="button big" type="text" name="title" style="width:80%" value="${entry.getTitle()}"><br><br>
+<textarea name="content">
+<c:out value="${entry.getContent()}" escapeXml="true"/></textarea>
 <input type="dropbox-chooser" name="selected-file"  id="db-chooser"/>
 <input type="hidden" name="repositoryName" value="${repository}"/>
 <input type="hidden" name="entryId" value="${entry.getId()}"/>
-<input type="submit" value="Finish"/>
+<input type="submit" class="button pill" value="Submit"/>
 </form>
+</div>
 <script type="text/javascript">
     // add an event listener to a Chooser button
     document.getElementById("db-chooser").addEventListener("DbxChooserSuccess",
@@ -44,6 +43,11 @@ $(function() {
             alert("Here's the chosen file: " + dlLink);
         }, false);
 </script>
-
+<script type="text/javascript" src="js/jquery.backstretch.min.js"></script>
+<script type="text/javascript">
+            $(function() {
+				$.backstretch("images/bg1.jpg");
+            });
+</script>
 </body>
 </html>

@@ -89,7 +89,7 @@ public class PanelController extends MultiActionController{
 		Repository repo=pageManager.getStubRepository(u, repoName);
 		if(pageManager.isRepositoryPageCMSInit(repo, accessToken))
 		{
-			int pid=0;
+			int pid=1;
 			String page=req.getParameter("page");
 			if(page!=null&&!page.isEmpty()) pid=Integer.valueOf(page);
 			ArticleSet aset=pageManager.getArticleSet(repo, accessToken);
@@ -97,9 +97,9 @@ public class PanelController extends MultiActionController{
 			List<Integer> ids=aset.getIds();
 			List<ArticleEntry> entrys=new ArrayList<ArticleEntry>();
 			int cid=0;
-			if(pid*WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE<setSize)
+			if((pid-1)*WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE<setSize)
 			{
-				cid=pid*WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE;
+				cid=(pid-1)*WebConstants.POSTPERPAGEINMANAGEREPOSITORYPAGE;
 			}
 			int added=0;
 			while(true)
@@ -109,7 +109,7 @@ public class PanelController extends MultiActionController{
 					ArticleEntry entry=pageManager.getArticleEntry(repo, ids.get(cid), accessToken);
 					if(entry!=null)
 					{
-					logger.info("load:"+entry.getId());
+					//logger.info("load:"+entry.getId());
 					entrys.add(entry);
 					}
 					
@@ -281,6 +281,8 @@ public class PanelController extends MultiActionController{
 		Repository repo=pageManager.getStubRepository(u, repoName);
 		String title=req.getParameter("title");
 		String content=req.getParameter("content");
+		if(title==null||content==null)
+			throw new Exception("Invalid Argument");
 		final ArticleEntry entry=new ArticleEntry();
 		entry.setContent(content);
 		entry.setAuthor(u.getName());

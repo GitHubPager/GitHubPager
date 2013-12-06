@@ -194,7 +194,7 @@ public class PageManager {
 		RawGitHubClient client=new RawGitHubClient();
 		client.setOAuth2Token(accessToken);
 		RawContentsService rService=new RawContentsService(client);
-		logger.info("Try to get file using raw content service");
+		logger.info("Try to get file using raw content service"+repo.getName()+path+ref);
 		return rService.getRawFileAsString(repo, path, ref, GitHubConstants.UTF8ENCODING);
 	}
 	
@@ -206,7 +206,7 @@ public class PageManager {
 		
 		ContentsService rService=new ContentsService();
 		rService.getClient().setOAuth2Token(accessToken);
-		logger.info("Try to get file using common content service");
+		logger.info("Try to get file using common content service "+repo.getName()+path+ref);
 		try
 		{
 			List<RepositoryContents> cList= rService.getContents(repo,path,ref);
@@ -616,6 +616,7 @@ public class PageManager {
 	/*
 	 * Edit A Article. 
 	 */
+	@CacheEvict(value = "github",key="#accessToken + #repo.name + #entry.id + 'article'")
 	public void editArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
 	{
 		String refString=getProperRefString(repo);
@@ -629,6 +630,7 @@ public class PageManager {
 	/*
 	 * Remove A Article. 
 	 */
+	@CacheEvict(value = "github",key="#accessToken + #repo.name + #entry.id + 'article'")
 	public void removeArticleEntry(Repository repo,ArticleEntry entry,String accessToken) throws Exception
 	{
 		String refString=getProperRefString(repo);
@@ -647,6 +649,7 @@ public class PageManager {
 	/*
 	 * Get A Article
 	 */
+	@Cacheable(value = "github",key="#accessToken + #repo.name +#id + 'article'")
 	public ArticleEntry getArticleEntry(Repository repo,long id,String accessToken) throws Exception
 	{
 		String refString=getProperRefString(repo);

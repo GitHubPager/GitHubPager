@@ -11,10 +11,20 @@ public final class editPost_jsp extends org.apache.jasper.runtime.HttpJspBase
 
   private static java.util.List<String> _jspx_dependants;
 
+  private org.apache.jasper.runtime.TagHandlerPool _jspx_tagPool_c_out_value_escapeXml_nobody;
+
   private org.glassfish.jsp.api.ResourceInjector _jspx_resourceInjector;
 
   public java.util.List<String> getDependants() {
     return _jspx_dependants;
+  }
+
+  public void _jspInit() {
+    _jspx_tagPool_c_out_value_escapeXml_nobody = org.apache.jasper.runtime.TagHandlerPool.getTagHandlerPool(getServletConfig());
+  }
+
+  public void _jspDestroy() {
+    _jspx_tagPool_c_out_value_escapeXml_nobody.release();
   }
 
   public void _jspService(HttpServletRequest request, HttpServletResponse response)
@@ -46,19 +56,16 @@ public final class editPost_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write(" \n");
       out.write("<html>\n");
       out.write("<head>\n");
-      out.write("<link rel=\"stylesheet\" href=\"http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css\" />\n");
       out.write("<script src=\"http://code.jquery.com/jquery-1.9.1.js\"></script>\n");
-      out.write("<script src=\"http://code.jquery.com/ui/1.10.3/jquery-ui.js\"></script>\n");
-      out.write("<script src=\"http://tinymce.cachefly.net/4.0/tinymce.min.js\"></script>\n");
+      out.write("<script src=\"http://tinymce.cachefly.net/4.0/tinymce.min.js\"></script><script type=\"text/javascript\" src=\"js/jquery.backstretch.min.js\"></script>\n");
       out.write("<script type=\"text/javascript\" src=\"https://www.dropbox.com/static/api/1/dropins.js\" id=\"dropboxjs\" data-app-key=\"bf1mlms18dgzf6g\"></script>\n");
-      out.write("<script>\n");
-      out.write("$(function() {\n");
-      out.write("    $( \"input[type=submit], a, button\" )\n");
-      out.write("      .button();\n");
-      out.write("});\n");
-      out.write("</script>\n");
+      out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/demo_1.css\" />\n");
+      out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style_1.css\" />\n");
+      out.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/button.css\" />\n");
+      out.write(" <link href='http://fonts.googleapis.com/css?family=Josefin+Slab:400,700' rel='stylesheet' type='text/css' />\n");
       out.write("<script>\n");
       out.write("        tinymce.init({selector:'textarea',\n");
+      out.write("        height:600,\n");
       out.write("\t\tplugins: [\n");
       out.write("        \"advlist autolink lists link image charmap print preview anchor\",\n");
       out.write("        \"searchreplace visualblocks code fullscreen\",\n");
@@ -69,18 +76,15 @@ public final class editPost_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("</script>\n");
       out.write("</head>\n");
       out.write("<body>\n");
-      out.write("<h1>User: ");
-      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${userInfo.getLogin()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
-      out.write("</h1>\n");
-      out.write("\t<h1>Repository:");
-      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${repository}", java.lang.String.class, (PageContext)_jspx_page_context, null));
-      out.write("</h1>\n");
+      out.write("<div class=\"container\" style=\"width:60%;margin:auto;\">\n");
+      out.write("<h1>Edit Post</h1>\n");
       out.write("<form action=\"panel?action=commitEditPost\" method=\"post\">\n");
-      out.write("<label for=\"title\">Title:</label><input type=\"text\" name=\"title\" value=\"");
+      out.write("<label for=\"title\" class=\"button danger\">Title:</label><input class=\"button big\" type=\"text\" name=\"title\" style=\"width:80%\" value=\"");
       out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${entry.getTitle()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
-      out.write("\" >\n");
-      out.write("<textarea name=\"content\">");
-      out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${entry.getContent()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
+      out.write("\"><br><br>\n");
+      out.write("<textarea name=\"content\">\n");
+      if (_jspx_meth_c_out_0(_jspx_page_context))
+        return;
       out.write("</textarea>\n");
       out.write("<input type=\"dropbox-chooser\" name=\"selected-file\"  id=\"db-chooser\"/>\n");
       out.write("<input type=\"hidden\" name=\"repositoryName\" value=\"");
@@ -89,8 +93,9 @@ public final class editPost_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("<input type=\"hidden\" name=\"entryId\" value=\"");
       out.write((java.lang.String) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${entry.getId()}", java.lang.String.class, (PageContext)_jspx_page_context, null));
       out.write("\"/>\n");
-      out.write("<input type=\"submit\" value=\"Finish\"/>\n");
+      out.write("<input type=\"submit\" class=\"button pill\" value=\"Submit\"/>\n");
       out.write("</form>\n");
+      out.write("</div>\n");
       out.write("<script type=\"text/javascript\">\n");
       out.write("    // add an event listener to a Chooser button\n");
       out.write("    document.getElementById(\"db-chooser\").addEventListener(\"DbxChooserSuccess\",\n");
@@ -99,9 +104,14 @@ public final class editPost_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("            alert(\"Here's the chosen file: \" + dlLink);\n");
       out.write("        }, false);\n");
       out.write("</script>\n");
-      out.write("\n");
+      out.write("<script type=\"text/javascript\" src=\"js/jquery.backstretch.min.js\"></script>\n");
+      out.write("<script type=\"text/javascript\">\n");
+      out.write("            $(function() {\n");
+      out.write("\t\t\t\t$.backstretch(\"images/bg1.jpg\");\n");
+      out.write("            });\n");
+      out.write("</script>\n");
       out.write("</body>\n");
-      out.write("</html>");
+      out.write("</html>\n");
     } catch (Throwable t) {
       if (!(t instanceof SkipPageException)){
         out = _jspx_out;
@@ -113,5 +123,24 @@ public final class editPost_jsp extends org.apache.jasper.runtime.HttpJspBase
     } finally {
       _jspxFactory.releasePageContext(_jspx_page_context);
     }
+  }
+
+  private boolean _jspx_meth_c_out_0(PageContext _jspx_page_context)
+          throws Throwable {
+    PageContext pageContext = _jspx_page_context;
+    JspWriter out = _jspx_page_context.getOut();
+    //  c:out
+    org.apache.taglibs.standard.tag.rt.core.OutTag _jspx_th_c_out_0 = (org.apache.taglibs.standard.tag.rt.core.OutTag) _jspx_tagPool_c_out_value_escapeXml_nobody.get(org.apache.taglibs.standard.tag.rt.core.OutTag.class);
+    _jspx_th_c_out_0.setPageContext(_jspx_page_context);
+    _jspx_th_c_out_0.setParent(null);
+    _jspx_th_c_out_0.setValue((java.lang.Object) org.apache.jasper.runtime.PageContextImpl.evaluateExpression("${entry.getContent()}", java.lang.Object.class, (PageContext)_jspx_page_context, null));
+    _jspx_th_c_out_0.setEscapeXml(true);
+    int _jspx_eval_c_out_0 = _jspx_th_c_out_0.doStartTag();
+    if (_jspx_th_c_out_0.doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {
+      _jspx_tagPool_c_out_value_escapeXml_nobody.reuse(_jspx_th_c_out_0);
+      return true;
+    }
+    _jspx_tagPool_c_out_value_escapeXml_nobody.reuse(_jspx_th_c_out_0);
+    return false;
   }
 }

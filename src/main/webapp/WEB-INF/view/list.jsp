@@ -12,6 +12,7 @@
         <link rel="shortcut icon" href="../favicon.ico"> 
         <link rel="stylesheet" type="text/css" href="css/demo_1.css" />
         <link rel="stylesheet" type="text/css" href="css/style_1.css" />
+        <link rel="stylesheet" type="text/css" href="css/button.css" />
         <link href='http://fonts.googleapis.com/css?family=Josefin+Slab:400,700' rel='stylesheet' type='text/css' />
 		<noscript>
 			<style>
@@ -36,17 +37,13 @@
             <div class="wrapper">
                 <div id="st-accordion" class="st-accordion">
                     <ul>
-                        <li>
-                            <a href="#">About<span class="st-arrow">Open or Close</span></a>
-                            <div class="st-content">
-                               
-                            </div>
-                        </li>
+                        
 						<c:forEach var="message" items="${repository}">
 						<li>
 							<a href="panel?action=manageRepository&repositoryName=${message.getName()}">${message.getName()}<span class="st-arrow">Open or Close</span></a>
 						    <div class="st-content">
                             <p>${message.getDescription()}</p>
+                            <a href="panel?action=manageRepository&repositoryName=${message.getName()}" class="button pill">Manage</a>
                             </div>
 						</li>
 						</c:forEach>                     
