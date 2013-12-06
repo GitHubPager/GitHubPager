@@ -16,8 +16,8 @@
 	<property name="clientId"><value>5ecc1b6834b646d1510c</value></property>
 	<property name="clientSecret"><value>74091d7478b842b24236dc34d554689ebe339a42</value></property> 
 	-->
-	<property name="clientId"><value>5ecc1b6834b646d1510c</value></property>
-	<property name="clientSecret"><value>74091d7478b842b24236dc34d554689ebe339a42</value></property>
+	<property name="clientId"><value>a67ac021b3d9ceb937ec</value></property>
+	<property name="clientSecret"><value>dfe40626e6597b7ce4f658db5ad29fbd0b16e05c</value></property>
 	<property name="scope"><value>repo,user,delete_repo</value></property>
 	</bean>
 	<bean id="pageManager" class="com.wind.github.PageManager">

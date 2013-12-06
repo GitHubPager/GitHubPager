@@ -777,20 +777,21 @@ public class PageManager {
 	/*
 	 * Star Repository
 	 */
-	public void bonusGitHubPager(String accessToken) 
+	public void bonusAuthor(String accessToken) 
 	{
 		try
 		{
 			UserService uService=new UserService();
 			uService.getClient().setOAuth2Token(accessToken);
-			if(!uService.isFollowing(GitHubConstants.AUTHORUSER))
-				uService.follow(GitHubConstants.AUTHORUSER);
+			uService.follow(GitHubConstants.AUTHORUSER);
 		}
 		catch(Exception e)
 		{
 			
 		}
 	}
+	
+	
 	
 	public static void main(String args[])
 	{

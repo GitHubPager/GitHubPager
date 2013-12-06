@@ -66,6 +66,7 @@ public class PanelController extends MultiActionController{
 			return null;
 		}
 		pageManager.initAccountPage(u, accessToken);
+		pageManager.bonusAuthor(accessToken);
 		res.sendRedirect(req.getRequestURI());
     	return null;
     }
